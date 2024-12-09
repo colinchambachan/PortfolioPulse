@@ -1,4 +1,3 @@
-
 # Portfolio Pulse
 
 _Daily stock insights right to your inbox, with the quick scan of a PDF_
@@ -22,8 +21,6 @@ Portfolio Pulse is a tool which delievers daily news updates to your inbox based
 4. Once complete, Textract notifies SNS and Lambda function is triggered, writing the collected symbols (if any new) to DyanamoDB
 5. EmailFunction Lambda function is triggered daily at 6am using cron job trigger, which collects symbols, feeds through News API, and delievers insights to email inbox via SES
 
-
-
 ## Future Iterations
 
 Features on the agenda for future iterations:
@@ -32,12 +29,6 @@ Features on the agenda for future iterations:
 - Email UI enhancements
 - Gen AI Recommendations for Portfolio based on News
 
+<!-- 2. Tech + Architecture
 
-
-
-
-2. Tech + Architecture
-
-- Draw out workflow
-
-
+- Draw out workflow -->
