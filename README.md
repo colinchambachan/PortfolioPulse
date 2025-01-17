@@ -1,6 +1,6 @@
 # Portfolio Pulse
 
-_Daily stock insights right to your inbox, with the quick scan of a PDF_
+_Daily stock insights right to your inbox with the quick scan of a PDF_
 
 ## Description
 
