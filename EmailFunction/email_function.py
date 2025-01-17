@@ -9,7 +9,6 @@ from datetime import date, timedelta
 import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), 'libraries'))
 import finnhub
-import env
 
 """
 get 3 headlines for the past 5 days for stock symbol
@@ -21,7 +20,7 @@ def get_headlines(symbol, client):
     date_prev = date.today()-timedelta(5)
     data=client.company_news(symbol, _from=date_prev, to=date_today)
     
-    for i in range(3):
+    for i in range(min(len(data), 3)):
         res.append((data[i]["headline"], data[i]["url"]))
 
     return res
@@ -37,27 +36,146 @@ def get_email_body(stock_data):
                     "AWS SDK for Python (Boto)."
                     )
     
-    BODY_HTML = """<html>
-                <head>
-                </head>
-                <body>
-                    <h1>{subject}</h1>
+    # BODY_HTML = """<html>
+    #             <head>
+    #             </head>
+    #             <body>
+    #                 <h1>{subject}</h1>
                     
-                    <p>Portfolio Update:</p>
-                    <ul>
-                        {stock_list}
-                    </ul>
-                </body>
-                </html>"""
+    #                 <p>Portfolio Update:</p>
+    #                 <ul>
+    #                     {stock_list}
+    #                 </ul>
+    #             </body>
+    #             </html>"""
+    # stock_list_items = "".join([
+    #     f"<div class='stock-item'><h3><b>{stock['symbol']} ({str(stock['quantity'])} Shares)</b></h3>" +
+    #     "<ul class='news-list'>" +
+    #     "".join([f"<li><a href='{news_item[1]}'>{news_item[0]}</a></li>" for news_item in stock['news']]) +
+    #     "</ul></div>"
+    #     for stock in stock_data
+    # ])
+    stock_list_items = ""
+    for stock in stock_data:
+        stock_item_html = f"<div class='stock-item'><h3><b>{stock['symbol']} ({str(stock['quantity'])} Shares)</b></h3>"
+        stock_item_html += "<ul class='news-list'>"
+        
+        if stock['news']:
+            for news_item in stock['news']:
+                stock_item_html += f"<li><a href='{news_item[1]}'>{news_item[0]}</a></li>"
+        else:
+            stock_item_html += "<li>No New Updates!</li>"
+        
+        stock_item_html += "</ul></div>"
+        stock_list_items += stock_item_html
     
+    BODY_HTML = """
+<html>
+<head>
+    <style>
+        a {
+            color: black;  /* Black text */
+            text-decoration: underline;  /* Underlined links */
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        h1 {
+            background-color: #4CAF50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            margin: 0;
+        }
+        .container {
+            width: 80%;
+            margin: 20px auto;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+        p {
+            font-size: 16px;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+        .stock-item {
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 15px;
+            margin-bottom: 15px;
+        }
+        .stock-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+        h3 {
+            font-size: 18px;
+            margin: 0;
+            color: #333;
+        }
+        .news-list {
+            list-style: none;
+            padding: 0;
+            margin-top: 10px;
+        }
+        .news-list li {
+            margin-bottom: 8px;
+        }
+        .news-list a {
+            color: #4CAF50;  /* Green color */
+            text-decoration: none;
+        }
+        .news-list a:hover {
+            text-decoration: underline;
+        }
+        .no-updates {
+            color: black;  /* Black text for "No New Updates" */
+            font-style: italic;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 14px;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+    <h1>"""+ SUBJECT + """</h1>
+
+    <div class="container">
+        <p><strong>Portfolio Update:</strong></p>
+        <div>
+            """+ stock_list_items + """
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>Thank you for using our service!</p>
+        <p>Feel free to reach out if you have any questions.</p>
+    </div>
+</body>
+</html>"""
+
+
     # Generate stock list HTML
-    stock_list_items = "".join([
-                f"<h3><b>{stock['symbol']} ({stock['quantity']} Shares)</b></h3><ul>" +
-                "".join([f"<li><a href='{news_item[1]}'>{news_item[0]}</a></li>" for news_item in stock['news']]) +
-                "</ul>"
-                for stock in stock_data
-                ])
-    BODY_HTML = BODY_HTML.format(stock_list=stock_list_items, subject=SUBJECT)
+    # stock_list_items = "".join([
+    #             f"<h3><b>{stock['symbol']} ({stock['quantity']} Shares)</b></h3><ul>" +
+    #             "".join([f"<li><a href='{news_item[1]}'>{news_item[0]}</a></li>" for news_item in stock['news']]) +
+    #             "</ul>"
+    #             for stock in stock_data
+    #             ])
+    
+
+    # print("Stock List Items: ", stock_list_items)
+    # print("Subject: ", SUBJECT)
+    print(stock_data)
+    # BODY_HTML = BODY_HTML
     
     return SUBJECT, BODY_TEXT, BODY_HTML
 
