@@ -1,5 +1,7 @@
 */env.py
-*/.zip
+*.zip
 */libraries/*
 */.aws-sam
 /__pycache__/*
+*.pdf
+*.jpg
