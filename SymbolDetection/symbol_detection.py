@@ -34,6 +34,7 @@ def lambda_handler(event, context):
                 },
                 FeatureTypes=["TABLES"],
             )
+        
         job_id = response["JobId"]
         print("job id:", job_id)
         
