@@ -56,7 +56,18 @@ def get_email_body(stock_data):
     #     for stock in stock_data
     # ])
     stock_list_items = ""
+    stocks_with_news = []
+    stocks_without_news = []
+
     for stock in stock_data:
+        if stock['news']:
+            stocks_with_news.append(stock)
+        else:
+            stocks_without_news.append(stock)
+
+    sorted_stocks = stocks_with_news + stocks_without_news
+
+    for stock in sorted_stocks:
         stock_item_html = f"<div class='stock-item'><h3><b>{stock['symbol']} ({str(stock['quantity'])} Shares)</b></h3>"
         stock_item_html += "<ul class='news-list'>"
         
