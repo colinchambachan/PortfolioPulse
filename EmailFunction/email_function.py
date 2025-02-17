@@ -71,96 +71,97 @@ def get_email_body(stock_data):
     
     BODY_HTML = """
 <html>
-<head>
+  <head>
     <style>
-        a {
-            color: black;  /* Black text */
-            text-decoration: underline;  /* Underlined links */
-        }
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
-            color: #333;
-            margin: 0;
-            padding: 0;
-        }
-        h1 {
-            background-color: #4CAF50;
-            color: white;
-            padding: 20px;
-            text-align: center;
-            margin: 0;
-        }
-        .container {
-            width: 80%;
-            margin: 20px auto;
-            background-color: white;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-        }
-        p {
-            font-size: 16px;
-            margin-bottom: 20px;
-            line-height: 1.6;
-        }
-        .stock-item {
-            border-bottom: 1px solid #ddd;
-            padding-bottom: 15px;
-            margin-bottom: 15px;
-        }
-        .stock-item:last-child {
-            border-bottom: none;
-            margin-bottom: 0;
-        }
-        h3 {
-            font-size: 18px;
-            margin: 0;
-            color: #333;
-        }
-        .news-list {
-            list-style: none;
-            padding: 0;
-            margin-top: 10px;
-        }
-        .news-list li {
-            margin-bottom: 8px;
-        }
-        .news-list a {
-            color: #4CAF50;  /* Green color */
-            text-decoration: none;
-        }
-        .news-list a:hover {
-            text-decoration: underline;
-        }
-        .no-updates {
-            color: black;  /* Black text for "No New Updates" */
-            font-style: italic;
-        }
-        .footer {
-            text-align: center;
-            margin-top: 30px;
-            font-size: 14px;
-            color: #777;
-        }
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f9;
+        color: #333;
+        margin: 0;
+        padding: 0;
+      }
+      h1 {
+        font-size: 2rem;
+        font-weight: bold;
+        color: #1f2937;
+        text-align: center;
+        padding: 20px;
+        background-color: #6d28d9;
+        color: white;
+        margin: 0;
+      }
+      .container {
+        width: 80%;
+        margin: 20px auto;
+        background-color: white;
+        border-radius: 10px;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+        padding: 20px;
+      }
+      p {
+        font-size: 18px;
+        color: #4b5563;
+        margin-bottom: 16px;
+        line-height: 1.6;
+      }
+      .stock-item {
+        border-bottom: 1px solid #e5e7eb;
+        padding-bottom: 15px;
+        margin-bottom: 15px;
+      }
+      .stock-item:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+      }
+      h3 {
+        font-size: 20px;
+        font-weight: bold;
+        color: #1f2937;
+        margin-bottom: 10px;
+      }
+      .news-list {
+        list-style: none;
+        padding: 0;
+        margin-top: 10px;
+      }
+      .news-list li {
+        margin-bottom: 8px;
+      }
+      .news-list a {
+        color: #6d28d9;
+        text-decoration: none;
+        font-weight: 500;
+      }
+      .news-list a:hover {
+        text-decoration: underline;
+      }
+      .no-updates {
+        color: black;
+        font-style: italic;
+      }
+      .footer {
+        text-align: center;
+        margin-top: 30px;
+        font-size: 14px;
+        color: #6b7280;
+      }
     </style>
-</head>
-<body>
-    <h1>"""+ SUBJECT + """</h1>
+  </head>
+  <body>
+    <h1>""" + SUBJECT + """</h1>
 
     <div class="container">
-        <p><strong>Portfolio Update:</strong></p>
-        <div>
-            """+ stock_list_items + """
-        </div>
+      <p><strong>Portfolio Update:</strong></p>
+      <div>""" + stock_list_items + """</div>
     </div>
 
     <div class="footer">
-        <p>Thank you for using our service!</p>
-        <p>Feel free to reach out if you have any questions.</p>
+      <p>Thank you for using our service!</p>
+      <p>Feel free to reach out if you have any questions.</p>
     </div>
-</body>
-</html>"""
+  </body>
+</html>
+"""
 
 
     # Generate stock list HTML
