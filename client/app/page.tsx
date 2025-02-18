@@ -81,7 +81,7 @@ export default function Landing() {
 
       {/* Third section */}
       <section
-        className="min-h-[50vh] w-full max-w-7xl mx-auto mb-5 grid grid-cols-1 md:grid-cols-2 gap-12 items-center px-4 md:px-8 mt-16"
+        className="min-h-[50vh] w-full max-w-7xl mx-auto mb-16 grid grid-cols-1 md:grid-cols-2 gap-12 items-center px-4 md:px-8 mt-16"
         data-aos="fade-up"
       >
         {/* Left side - Text content */}
