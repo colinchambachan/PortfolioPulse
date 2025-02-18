@@ -1,0 +1,135 @@
+<html>
+  <head>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Popper:wght@400;500;600;700&display=swap");
+
+      body {
+        font-family: "Popper", sans-serif;
+        background-color: #f4f4f9;
+        color: #333;
+        margin: 0;
+        padding: 0;
+      }
+
+      h1 {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #1f2937;
+        text-align: center;
+        padding: 20px;
+        background-color: #6d28d9;
+        color: white;
+        margin: 0;
+        font-family: "Popper", Arial, sans-serif;
+      }
+
+      .container {
+        width: 80%;
+        margin: 20px auto;
+        background-color: white;
+        border-radius: 10px;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+        padding: 20px;
+        font-family: "Popper", Arial, sans-serif;
+      }
+
+      p {
+        font-size: 18px;
+        color: #4b5563;
+        margin-bottom: 16px;
+        line-height: 1.6;
+        font-family: "Popper", Arial, sans-serif;
+        font-weight: 400;
+      }
+
+      .stock-item {
+        border-bottom: 1px solid #e5e7eb;
+        padding-bottom: 15px;
+        margin-bottom: 15px;
+        font-family: "Popper", Arial, sans-serif;
+      }
+
+      .stock-item:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+      }
+
+      h3 {
+        font-size: 20px;
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 10px;
+        font-family: "Popper", Arial, sans-serif;
+      }
+
+      .news-list {
+        list-style: none;
+        padding: 0;
+        margin-top: 10px;
+        font-family: "Popper", Arial, sans-serif;
+      }
+
+      .news-list li {
+        margin-bottom: 8px;
+      }
+
+      .news-list a {
+        color: #6d28d9;
+        text-decoration: none;
+        font-weight: 500;
+        font-family: "Popper", Arial, sans-serif;
+      }
+
+      .news-list a:hover {
+        text-decoration: underline;
+      }
+
+      .no-updates {
+        color: black;
+        font-style: italic;
+        font-family: "Popper", Arial, sans-serif;
+      }
+
+      .footer {
+        text-align: center;
+        margin-top: 30px;
+        font-size: 14px;
+        color: #6b7280;
+        font-family: "Popper", Arial, sans-serif;
+      }
+
+      .unsubscribe {
+        margin-top: 10px;
+        font-size: 14px;
+      }
+
+      .unsubscribe a {
+        color: #6d28d9;
+        text-decoration: none;
+        font-weight: 500;
+      }
+
+      .unsubscribe a:hover {
+        text-decoration: underline;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>""" + SUBJECT + """</h1>
+
+    <div class="container">
+      <p><strong>Portfolio Update:</strong></p>
+      <div>""" + stock_list_items + """</div>
+    </div>
+
+    <div class="footer">
+      <p>Thank you for using our service!</p>
+      <p>Feel free to reach out if you have any questions.</p>
+      <p class="unsubscribe">
+        <a href="https://portfoliopulse.xyz/configure"
+          >Unsubscribe or manage preferences</a
+        >
+      </p>
+    </div>
+  </body>
+</html>
