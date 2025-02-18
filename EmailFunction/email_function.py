@@ -210,7 +210,7 @@ def lambda_handler(event, context):
         # query table for stock expressions under colin
         table = dynamodb_resource.Table(TABLE_NAME)
         # filter for user colin
-        filtering_exp = Key("user").eq("colin")
+        filtering_exp = Key("user").eq("colin.chambachan@gmail.com")
         response = table.scan(FilterExpression=filtering_exp)
         sorted_items = sorted(response['Items'], key=lambda x: x['quantity'], reverse=True)
 
