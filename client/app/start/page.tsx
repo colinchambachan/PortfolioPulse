@@ -1,6 +1,5 @@
 "use client";
-import { useState } from "react";
-import React, { useEffect } from "react";
+import { useState, useEffect } from "react";
 import AOS from "aos";
 import "aos/dist/aos.css";
 import {
@@ -9,10 +8,77 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { FaPencilAlt, FaTimes } from "react-icons/fa";
+import { BsQuestionCircle } from "react-icons/bs";
+import Image from "next/image";
 
 export default function Start() {
   const [email, setEmail] = useState("");
   const [file, setFile] = useState<File | null>(null);
+  const [editing, setEditing] = useState<string | null>(null);
+  const [newValue, setNewValue] = useState<number | string>("");
+  const [newSymbol, setNewSymbol] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean | null>(false);
+
+  // State for data, initially set to default values
+  // const [data, setData] = useState({
+  //   VEQT: 193.2488,
+  //   VDY: 27.0642,
+  //   VFV: 67.0714,
+  // });
+
+  const [data, setData] = useState({});
+
+  // Function to trigger editing mode for a specific symbol
+  const handleEdit = (symbol: string): void => {
+    setEditing(symbol);
+    setNewSymbol(symbol);
+    setNewValue(data[symbol]);
+  };
+
+  // Function to save the edited value
+  const handleSave = (): void => {
+    if (editing !== null) {
+      setData((prevData) => {
+        const dataArray = Object.entries(prevData);
+        const indexToRemove = dataArray.findIndex(([key]) => key === editing);
+
+        if (indexToRemove !== -1) {
+          dataArray.splice(indexToRemove, 1);
+        }
+
+        const updatedSymbol = newSymbol || editing;
+        const updatedValue =
+          newValue !== "" ? Number(newValue) : prevData[editing];
+        dataArray.splice(indexToRemove, 0, [updatedSymbol, updatedValue]);
+
+        return Object.fromEntries(dataArray);
+      });
+    }
+
+    setEditing(null);
+  };
+
+  // Function to delete a symbol from the data
+  const handleDelete = (symbol: string): void => {
+    setData((prevData) => {
+      const newData = { ...prevData };
+      delete newData[symbol];
+      return newData;
+    });
+  };
+
+  useEffect(() => {
+    console.log("Data updated:", data);
+  }, [data]);
 
   useEffect(() => {
     AOS.init({
@@ -59,7 +125,7 @@ export default function Start() {
                 id="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent bg-white"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent bg-white focus:bg-white"
                 placeholder="you@example.com"
                 required
               />
@@ -68,9 +134,39 @@ export default function Start() {
             <div>
               <label
                 htmlFor="document"
-                className="block text-sm font-medium text-gray-700 mb-1"
+                className="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-2"
               >
                 Upload Portfolio Document
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <button
+                      type="button"
+                      className="text-gray-500 hover:text-purple-600 transition-colors"
+                    >
+                      <BsQuestionCircle className="w-4 h-4" />
+                    </button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-[600px] w-[90vw]">
+                    <DialogHeader>
+                      <DialogTitle>Portfolio Document Format</DialogTitle>
+                      <DialogDescription>
+                        Upload a clear image or PDF of your investment
+                        portfolio. The document should show your stock holdings
+                        with quantities. Please see the following example from
+                        Wealthsimple:
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="mt-4 flex justify-center">
+                      <Image
+                        src="/example_portfolio.png"
+                        alt="Example portfolio document"
+                        width={450}
+                        height={200}
+                        className="rounded-lg border border-gray-200"
+                      />
+                    </div>
+                  </DialogContent>
+                </Dialog>
               </label>
               <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg hover:border-purple-500 transition-colors">
                 <label
@@ -94,9 +190,9 @@ export default function Start() {
                     </svg>
                     <div className="flex text-sm text-gray-600">
                       <span className="font-medium text-purple-600 hover:text-purple-700">
-                        Upload a file
+                        Click to Upload a File
                       </span>
-                      <p className="pl-1">or drag and drop</p>
+                      {/* <p className="pl-1">or drag and drop</p> */}
                     </div>
                     <p className="text-xs text-gray-500">
                       PDF, PNG, JPG up to 1MB
@@ -120,16 +216,91 @@ export default function Start() {
                 </p>
               )}
             </div>
+            {isLoading && (
+              <div className="flex justify-center">
+                <span className="loading loading-dots loading-md"></span>
+              </div>
+            )}
 
+            {/* Table */}
+            {Object.keys(data).length > 0 && (
+              <div className="overflow-x-auto">
+                <table className="table">
+                  <thead>
+                    <tr>
+                      <th>Symbol</th>
+                      <th>Quantity</th>
+                      <th>Edit</th>
+                      <th>Delete</th> {/* Added Delete column */}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {Object.keys(data).map((symbol) => (
+                      <tr key={symbol}>
+                        <td>
+                          {editing === symbol ? (
+                            <input
+                              type="text"
+                              className="bg-white border border-gray-300 p-1 w-16"
+                              value={newSymbol}
+                              onChange={(e) => setNewSymbol(e.target.value)}
+                            />
+                          ) : (
+                            symbol
+                          )}
+                        </td>
+                        <td>
+                          {editing === symbol ? (
+                            <input
+                              type="number"
+                              className="bg-white border border-gray-300 p-1 w-32"
+                              value={newValue}
+                              onChange={(e) => setNewValue(e.target.value)}
+                            />
+                          ) : (
+                            data[symbol]
+                          )}
+                        </td>
+                        <td className="w-24">
+                          {editing === symbol ? (
+                            <button
+                              className="btn btn-outline btn-xs"
+                              onClick={() => handleSave(symbol)}
+                            >
+                              Save
+                            </button>
+                          ) : (
+                            <button onClick={() => handleEdit(symbol)}>
+                              <FaPencilAlt />
+                            </button>
+                          )}
+                        </td>
+                        <td className="w-24">
+                          {/* Delete button */}
+                          <button
+                            className="text-red-500"
+                            onClick={() => handleDelete(symbol)}
+                          >
+                            <FaTimes />
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+
+            {/* Submit Button with Tooltip */}
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <button
                     type="submit"
-                    className="w-full bg-purple-600 bg-slate-500 text-white px-4 py-3 rounded-lg hover:bg-purple-700 transition-all font-medium"
-                    disabled={true}
+                    className="w-full bg-purple-600 text-white px-4 py-3 rounded-lg hover:bg-purple-700 transition-all font-medium"
+                    // disabled={true}
                   >
-                    Feature Coming Soon!
+                    Submit & Start Workflow
                   </button>
                 </TooltipTrigger>
                 <TooltipContent>
@@ -141,10 +312,11 @@ export default function Start() {
         </div>
       </div>
 
+      {/* Footer */}
       <footer className="w-full text-center py-4 border-t border-gray-100 bg-white">
-        <p className="text-gray-600">
-          © 2025 Portfolio Pulse, All Rights Reserved
-        </p>
+        <div className="text-center">
+          <p>&copy; 2025 My Portfolio. All Rights Reserved.</p>
+        </div>
       </footer>
     </div>
   );
