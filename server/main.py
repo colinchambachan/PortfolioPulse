@@ -24,7 +24,7 @@ def extract_stock_data(text: str):
 
     for match in matches:
         symbol, quantity = match
-        stock_data[symbol] = float(quantity.replace(",", ""))
+        stock_data[symbol] = round(float(quantity.replace(",", "")), 2)
 
     return stock_data
 
