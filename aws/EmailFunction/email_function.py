@@ -66,6 +66,7 @@ def get_email_body(stock_data):
             stocks_without_news.append(stock)
 
     sorted_stocks = stocks_with_news + stocks_without_news
+    sorted_stocks = sorted_stocks[:min(3, len(sorted_stocks))] # limit to 3 stocks
 
     for stock in sorted_stocks:
         stock_item_html = f"<div class='stock-item'><h3><b>{stock['symbol']} ({str(stock['quantity'])} Shares)</b></h3>"
