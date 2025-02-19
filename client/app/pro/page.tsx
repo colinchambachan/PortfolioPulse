@@ -81,7 +81,7 @@ export default function Pro() {
               </div>
               <div className="flex items-center space-x-3">
                 <BsCheckLg className="text-white text-xl" />
-                <span>GenAI portfolio recommendations</span>
+                <span>GenAI position recommendations</span>
               </div>
               <div className="flex items-center space-x-3">
                 <BsCheckLg className="text-white text-xl" />

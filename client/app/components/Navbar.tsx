@@ -13,8 +13,7 @@ export default function Navbar() {
 
   return (
     <nav
-      className="w-full flex items-center justify-between px-8 border-b border-gray-100 fixed top-0 z-10 bg-white"
-      style={{ backgroundColor: "#F9FAFC" }}
+      className="w-full flex items-center justify-between px-8 border-b border-gray-100/30 fixed top-0 z-10 bg-white/70 backdrop-blur-md supports-[backdrop-filter]:bg-white/70"
       data-aos="fade-down"
     >
       <div className="flex items-center">

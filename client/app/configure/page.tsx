@@ -35,7 +35,7 @@ export default function Configure() {
         <div className="max-w-md w-full" data-aos="fade-up">
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              Configure PortfolioPulse
+              Leave PortfolioPulse
             </h1>
             <p className="text-gray-600">
               Sorry to see you go, please enter your subscribed email if you
