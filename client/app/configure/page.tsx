@@ -38,8 +38,8 @@ export default function Configure() {
               Configure PortfolioPulse
             </h1>
             <p className="text-gray-600">
-              Sorry to see you go, enter your email if you wish to be removed
-              from your Workflow
+              Sorry to see you go, please enter your subscribed email if you
+              wish to be removed from your automation
             </p>
           </div>
 
