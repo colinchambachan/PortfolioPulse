@@ -25,7 +25,8 @@ Portfolio Pulse is a tool which delievers daily news updates to your inbox based
 
 Features on the agenda for future iterations:
 
-- CLI Tool for Statement upload (and pdf to jpg conversion via ffmpeg)
+- <del>CLI Tool for Statement upload (and pdf to jpg conversion via ffmpeg)</del>
+  - [IN PROGRESS] Replace idea for Full Stack app which handles both
 - [[COMPLETED](https://github.com/colinchambachan/PortfolioPulse/commit/32264d2978a9cb6637b68a16b0f802261242a0c6)] Email UI enhancements
 - Gen AI Recommendations for Portfolio based on News
 
