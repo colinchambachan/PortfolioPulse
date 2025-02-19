@@ -58,7 +58,9 @@ export default function Landing() {
         {/* Left side - Image */}
         <div className="relative" data-aos="fade-left" data-aos-delay="200">
           <div className="relative">
-            <img
+            <Image
+              width={4000}
+              height={4000}
               src="/landing1.png"
               alt="Portfolio Pulse Dashboard"
               className="w-full h-auto rounded-lg shadow-[0_8px_30px_rgb(0,0,0,0.12)]"
@@ -98,8 +100,10 @@ export default function Landing() {
         {/* Right side - Image */}
         <div className="relative" data-aos="fade-left" data-aos-delay="200">
           <div className="relative">
-            <img
+            <Image
               src="/landing2.jpg"
+              width={4000}
+              height={4000}
               alt="Portfolio Pulse Dashboard"
               className="w-full h-auto rounded-lg shadow-[0_8px_30px_rgb(0,0,0,0.12)]"
             />
