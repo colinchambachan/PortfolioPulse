@@ -55,7 +55,7 @@ export default function Pro() {
             </div>
             <div className="justify-end">
               <Link href="/start">
-                <button className="w-full bg-gray-100 text-gray-900 px-6 py-3 rounded-lg hover:bg-gray-200 transition-all font-medium mt-auto">
+                <button className="w-full bg-gray-200 text-gray-900 px-6 py-3 rounded-lg hover:bg-gray-200 transition-all font-medium mt-auto">
                   Get Started
                 </button>
               </Link>
@@ -67,9 +67,9 @@ export default function Pro() {
             className="bg-purple-600 rounded-xl shadow-lg p-8 text-white relative overflow-hidden"
             data-aos="fade-left"
           >
-            <div className="absolute top-4 right-4 bg-purple-500 px-3 py-1 rounded-full text-sm">
+            {/* <div className="absolute top-4 right-4 bg-purple-500 px-3 py-1 rounded-full text-sm">
               Popular
-            </div>
+            </div> */}
             <h2 className="text-2xl font-bold mb-4">Pro</h2>
             <p className="text-4xl font-bold mb-6">
               $0.99<span className="text-lg font-normal">/month</span>
@@ -87,17 +87,17 @@ export default function Pro() {
                 <BsCheckLg className="text-white text-xl" />
                 <span>Unlimited Symbols tracked</span>
               </div>
-              <div className="flex items-center space-x-3">
+              {/* <div className="flex items-center space-x-3">
                 <BsCheckLg className="text-white text-xl" />
                 <span>Priority support</span>
-              </div>
+              </div> */}
             </div>
             <a
               href="mailto:info.portfoliopulse@gmail.com"
               className="text-purple-600 hover:underline"
             >
               <button className="w-full bg-white text-purple-600 px-6 py-3 rounded-lg hover:bg-gray-100 transition-all font-medium">
-                Coming soon (If you're interested, email us at
+                Coming soon (If you&apos;re interested, email us at
                 info.portfoliopulse@gmail.com )
               </button>
             </a>
