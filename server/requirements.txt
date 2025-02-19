@@ -1,0 +1,5 @@
+fastapi 
+uvicorn 
+pytesseract 
+pillow
+pdf2image
