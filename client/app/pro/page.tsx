@@ -31,7 +31,7 @@ export default function Pro() {
         <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
           {/* Free Tier */}
           <div
-            className="bg-white rounded-xl shadow-lg p-8 border border-gray-100"
+            className="bg-white rounded-xl shadow-lg p-8 border border-gray-100 flex flex-col "
             data-aos="fade-right"
           >
             <h2 className="text-2xl font-bold text-gray-900 mb-4">Free</h2>
@@ -53,10 +53,12 @@ export default function Pro() {
                 <span className="text-gray-700">Email notifications</span>
               </div>
             </div>
-            <div className="flex-1 flex flex-col justify-end mt-auto">
-              <button className="w-full bg-gray-100 text-gray-900 px-6 py-3 rounded-lg hover:bg-gray-200 transition-all font-medium">
-                <Link href="/start">Get Started</Link>
-              </button>
+            <div className="justify-end">
+              <Link href="/start">
+                <button className="w-full bg-gray-100 text-gray-900 px-6 py-3 rounded-lg hover:bg-gray-200 transition-all font-medium mt-auto">
+                  Get Started
+                </button>
+              </Link>
             </div>
           </div>
 
@@ -85,10 +87,6 @@ export default function Pro() {
                 <BsCheckLg className="text-white text-xl" />
                 <span>Unlimited Symbols tracked</span>
               </div>
-              {/* <div className="flex items-center space-x-3">
-                <BsCheckLg className="text-white text-xl" />
-                <span>Customizable dashboard</span>
-              </div> */}
               <div className="flex items-center space-x-3">
                 <BsCheckLg className="text-white text-xl" />
                 <span>Priority support</span>
@@ -99,11 +97,10 @@ export default function Pro() {
               className="text-purple-600 hover:underline"
             >
               <button className="w-full bg-white text-purple-600 px-6 py-3 rounded-lg hover:bg-gray-100 transition-all font-medium">
-                {/* <Link href="/start">Upgrade to Pro</Link> */}
                 Coming soon (If you're interested, email us at
                 info.portfoliopulse@gmail.com )
               </button>
-            </a>{" "}
+            </a>
           </div>
         </div>
 
