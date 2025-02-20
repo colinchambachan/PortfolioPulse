@@ -1,10 +1,11 @@
-*/env.py
+**/env.py
 *.zip
 */libraries/*
 */.aws-sam
 /__pycache__/*
 *.pdf
 *.jpg
+**DS_Store
 
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
