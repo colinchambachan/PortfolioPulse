@@ -27,15 +27,13 @@ export default function Start() {
   const [newValue, setNewValue] = useState<number | string>("");
   const [newSymbol, setNewSymbol] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean | null>(false);
-
+  const [data, setData] = useState({});
   // State for data, initially set to default values
   // const [data, setData] = useState({
   //   VEQT: 193.2488,
   //   VDY: 27.0642,
   //   VFV: 67.0714,
   // });
-
-  const [data, setData] = useState({});
 
   // Function to trigger editing mode for a specific symbol
   const handleEdit = (symbol: string): void => {
@@ -112,7 +110,17 @@ export default function Start() {
             </p>
           </div>
 
-          <form className="space-y-6">
+          <form
+            className="space-y-6"
+            onSubmit={(e) => {
+              e.preventDefault();
+              setIsLoading(true);
+              setTimeout(() => {
+                setIsLoading(false);
+                alert("Submitted!");
+              }, 2000);
+            }}
+          >
             <div>
               <label
                 htmlFor="email"
@@ -303,9 +311,9 @@ export default function Start() {
                     Submit & Start Workflow
                   </button>
                 </TooltipTrigger>
-                <TooltipContent>
+                {/* <TooltipContent>
                   <p>Coming Soon!</p>
-                </TooltipContent>
+                </TooltipContent> */}
               </Tooltip>
             </TooltipProvider>
           </form>
