@@ -74,7 +74,7 @@ export default function Configure() {
                       type="submit"
                       className="w-full bg-red-600 text-white px-4 py-3 rounded-lg hover:bg-red-700 transition-all font-medium"
                     >
-                      Unsubscribe from Service
+                      Unsubscribe from PortfolioPulse
                     </button>
                   </TooltipTrigger>
                   <TooltipContent>
