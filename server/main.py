@@ -5,9 +5,19 @@ from PIL import Image
 import io
 from pdf2image import convert_from_bytes
 import re
+from fastapi.middleware.cors import CORSMiddleware
+
 
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=False,  # Changed to False
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/")
 def read_root(user: Union[str, None] = None):
@@ -25,7 +35,7 @@ def extract_stock_data(text: str):
     for match in matches:
         symbol, quantity = match
         stock_data[symbol] = round(float(quantity.replace(",", "")), 2)
-
+    
     return stock_data
 
 @app.post("/extract-symbols")
