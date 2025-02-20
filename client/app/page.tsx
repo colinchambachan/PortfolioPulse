@@ -155,10 +155,10 @@ export default function Landing() {
       </section>
 
       {/* Social Proof section */}
-      <section className="py-20 bg-gray-50">
+      <section className="py-12 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 md:px-8 text-center">
           <div
-            className="flex flex-wrap justify-center gap-8 mb-8"
+            className="flex flex-wrap items-center justify-center gap-12 mb-8"
             data-aos="fade-up"
           >
             <Image
@@ -166,25 +166,26 @@ export default function Landing() {
               alt="Wealthsimple"
               width={120}
               height={40}
-              className="h-8 w-auto grayscale opacity-50 hover:opacity-100 transition-opacity"
+              className="h-8 w-auto opacity-50 hover:opacity-100 transition-opacity"
             />
             <Image
-              src="/questrade.png"
-              alt="Questrade"
+              src="/rbc.png"
+              alt="RBC"
               width={120}
               height={40}
-              className="h-8 w-auto grayscale opacity-50 hover:opacity-100 transition-opacity"
+              className="h-32 w-auto opacity-50 hover:opacity-100 transition-opacity"
             />
+
             <Image
-              src="/td.png"
-              alt="TD"
+              src="/cibc.png"
+              alt="CIBC"
               width={120}
               height={40}
-              className="h-8 w-auto grayscale opacity-50 hover:opacity-100 transition-opacity"
+              className="h-8 w-auto opacity-50 hover:opacity-100 transition-opacity"
             />
           </div>
           <p className="text-sm text-gray-500">
-            Compatible with major Canadian brokers
+            Compatible with major Financial Institutions
           </p>
         </div>
       </section>
