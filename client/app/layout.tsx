@@ -1,28 +1,14 @@
 import type { Metadata } from "next";
-import { Poppins } from "next/font/google";
-import Navbar from "./components/Navbar";
+import { Inter } from "next/font/google";
 import "./globals.css";
+import Navbar from "./components/Navbar";
+import Providers from "./providers";
 
-const poppins = Poppins({
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-});
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "PortfolioPulse | Make Informed Trades",
-  description: "Generate daily market insights based on your stock portfolio",
-  image: "/logo_nobg.png",
-  url: "https://portfoliopulse.vercel.app",
-  type: "website",
-  keywords: [
-    "stocks",
-    "trading",
-    "investing",
-    "portfolio",
-    "market insights",
-    "automation",
-    "OCR",
-  ],
+  title: "PortfolioPulse",
+  description: "Your Portfolio, Smarter Every Morning",
 };
 
 export default function RootLayout({
@@ -32,9 +18,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={poppins.className}>
-        <Navbar />
-        <main className="pt-16">{children}</main>
+      <body className={inter.className}>
+        <Providers>
+          <Navbar />
+          {children}
+        </Providers>
       </body>
     </html>
   );

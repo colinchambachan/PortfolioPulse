@@ -1,19 +1,12 @@
 "use client";
 import { BsGear } from "react-icons/bs";
 import Image from "next/image";
-import { useState } from "react";
 import Link from "next/link";
 
 export default function Navbar() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
-  };
-
   return (
     <nav
-      className="w-full flex items-center justify-between px-8 border-b border-gray-100/30 fixed top-0 z-10 bg-white/70 backdrop-blur-md supports-[backdrop-filter]:bg-white/70"
+      className="w-full flex items-center justify-between px-8 border-b border-gray-100/30 bg-white/70 backdrop-blur-md supports-[backdrop-filter]:bg-white/70"
       data-aos="fade-down"
     >
       <div className="flex items-center">
@@ -75,7 +68,8 @@ export default function Navbar() {
         </div>
         <ul
           tabIndex={0}
-          className="menu dropdown-content bg-white text-gray-900 rounded-box z-[1] w-52 shadow-2xl"
+          className="menu dropdown-content bg-white text-gray-900 rounded-box z-10 w-52 shadow-2xl"
+          style={{ backgroundColor: "white" }}
         >
           <li>
             <Link href="/">Home</Link>

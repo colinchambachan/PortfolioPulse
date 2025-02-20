@@ -155,7 +155,7 @@ export default function Landing() {
       </section>
 
       {/* Social Proof section */}
-      <section className="py-12 bg-gray-50">
+      <section className="py-24 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 md:px-8 text-center">
           <div
             className="flex flex-wrap items-center justify-center gap-12 mb-8"
