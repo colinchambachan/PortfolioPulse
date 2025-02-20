@@ -1,7 +1,5 @@
-import json
 import boto3
 import os
-# from dotenv import load_dotenv
 from botocore.exceptions import ClientError
 from boto3.dynamodb.conditions import Key
 from datetime import date, timedelta
@@ -35,26 +33,6 @@ def get_email_body(stock_data):
                     "This email was sent with Amazon SES using the "
                     "AWS SDK for Python (Boto)."
                     )
-    
-    # BODY_HTML = """<html>
-    #             <head>
-    #             </head>
-    #             <body>
-    #                 <h1>{subject}</h1>
-                    
-    #                 <p>Portfolio Update:</p>
-    #                 <ul>
-    #                     {stock_list}
-    #                 </ul>
-    #             </body>
-    #             </html>"""
-    # stock_list_items = "".join([
-    #     f"<div class='stock-item'><h3><b>{stock['symbol']} ({str(stock['quantity'])} Shares)</b></h3>" +
-    #     "<ul class='news-list'>" +
-    #     "".join([f"<li><a href='{news_item[1]}'>{news_item[0]}</a></li>" for news_item in stock['news']]) +
-    #     "</ul></div>"
-    #     for stock in stock_data
-    # ])
     stock_list_items = ""
     stocks_with_news = []
     stocks_without_news = []
@@ -66,7 +44,7 @@ def get_email_body(stock_data):
             stocks_without_news.append(stock)
 
     sorted_stocks = stocks_with_news + stocks_without_news
-    sorted_stocks = sorted_stocks[:min(3, len(sorted_stocks))] # limit to 3 stocks
+    sorted_stocks = sorted_stocks[:min(3, len(sorted_stocks))] # limit to 3
 
     for stock in sorted_stocks:
         stock_item_html = f"<div class='stock-item'><h3><b>{stock['symbol']} ({str(stock['quantity'])} Shares)</b></h3>"
@@ -81,114 +59,12 @@ def get_email_body(stock_data):
         stock_item_html += "</ul></div>"
         stock_list_items += stock_item_html
     
-    BODY_HTML = """
-<html>
-  <head>
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-        background-color: #f4f4f9;
-        color: #333;
-        margin: 0;
-        padding: 0;
-      }
-      h1 {
-        font-size: 2rem;
-        font-weight: bold;
-        color: #1f2937;
-        text-align: center;
-        padding: 20px;
-        background-color: #6d28d9;
-        color: white;
-        margin: 0;
-      }
-      .container {
-        width: 80%;
-        margin: 20px auto;
-        background-color: white;
-        border-radius: 10px;
-        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
-        padding: 20px;
-      }
-      p {
-        font-size: 18px;
-        color: #4b5563;
-        margin-bottom: 16px;
-        line-height: 1.6;
-      }
-      .stock-item {
-        border-bottom: 1px solid #e5e7eb;
-        padding-bottom: 15px;
-        margin-bottom: 15px;
-      }
-      .stock-item:last-child {
-        border-bottom: none;
-        margin-bottom: 0;
-      }
-      h3 {
-        font-size: 20px;
-        font-weight: bold;
-        color: #1f2937;
-        margin-bottom: 10px;
-      }
-      .news-list {
-        list-style: none;
-        padding: 0;
-        margin-top: 10px;
-      }
-      .news-list li {
-        margin-bottom: 8px;
-      }
-      .news-list a {
-        color: #6d28d9;
-        text-decoration: none;
-        font-weight: 500;
-      }
-      .news-list a:hover {
-        text-decoration: underline;
-      }
-      .no-updates {
-        color: black;
-        font-style: italic;
-      }
-      .footer {
-        text-align: center;
-        margin-top: 30px;
-        font-size: 14px;
-        color: #6b7280;
-      }
-    </style>
-  </head>
-  <body>
-    <h1>""" + SUBJECT + """</h1>
+    with open('email_template.html', 'r') as file:
+      BODY_HTML = file.read()
 
-    <div class="container">
-      <p><strong>Portfolio Update:</strong></p>
-      <div>""" + stock_list_items + """</div>
-    </div>
+    BODY_HTML = BODY_HTML.replace('{SUBJECT}', SUBJECT)
+    BODY_HTML = BODY_HTML.replace('{stock_list_items}', stock_list_items)
 
-    <div class="footer">
-      <p>Thank you for using our service!</p>
-      <p>Feel free to reach out if you have any questions.</p>
-    </div>
-  </body>
-</html>
-"""
-
-
-    # Generate stock list HTML
-    # stock_list_items = "".join([
-    #             f"<h3><b>{stock['symbol']} ({stock['quantity']} Shares)</b></h3><ul>" +
-    #             "".join([f"<li><a href='{news_item[1]}'>{news_item[0]}</a></li>" for news_item in stock['news']]) +
-    #             "</ul>"
-    #             for stock in stock_data
-    #             ])
-    
-
-    # print("Stock List Items: ", stock_list_items)
-    # print("Subject: ", SUBJECT)
-    print(stock_data)
-    # BODY_HTML = BODY_HTML
     
     return SUBJECT, BODY_TEXT, BODY_HTML
 
