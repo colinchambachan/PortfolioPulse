@@ -75,7 +75,9 @@ def lambda_handler(event, context):
     RECIPIENT = os.getenv("RECIPIENT")
     TABLE_NAME = os.getenv("TABLE_NAME")
     FINNHUB_API = os.getenv("FINNHUB_API")
-
+    CLIENT_ID = os.getenv("CLIENT_ID")
+    CLIENT_SECRET = os.getenv("CLIENT_SECRET")
+    REFRESH_TOKEN = os.getenv("REFRESH_TOKEN")
     
     # Resource declarations
     ses = boto3.client('ses', region_name=AWS_DEFAULT_REGION)
