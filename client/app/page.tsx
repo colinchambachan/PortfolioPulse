@@ -61,12 +61,15 @@ export default function Landing() {
           </div>
 
           {/* Right side - Image */}
-          <div className="relative z-10" data-aos="fade-left">
+          <div
+            className="relative z-10 w-full max-w-[400px] md:max-w-[450px] mx-auto"
+            data-aos="fade-left"
+          >
             <div className="relative bg-white p-2 rounded-2xl shadow-[0_20px_50px_rgba(8,_112,_184,_0.7)]">
               <Image
-                width={4000}
-                height={400}
-                src="/dashboard_preview.png"
+                width={600}
+                height={60}
+                src="/dashboard_preview3.png"
                 alt="Portfolio Pulse Dashboard"
                 className="w-full h-auto rounded-xl"
               />

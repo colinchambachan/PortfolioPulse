@@ -1,3 +1,7 @@
+"""
+AWS Lambda function using GMAIL api to send email
+
+"""
 import boto3
 import os
 from botocore.exceptions import ClientError
@@ -45,7 +49,7 @@ def get_email_body(stock_data):
     sorted_stocks = sorted_stocks[:min(3, len(sorted_stocks))]
 
     for stock in sorted_stocks:
-        stock_item_html = f"<div class='stock-item'><h3><b>{stock['symbol']} ({str(stock['quantity'])} Shares)</b></h3>"
+        stock_item_html = f"<div class='stock-card'><div class='stock-header'><h3 class='stock-symbol'>{stock['symbol']}</h3><span class='stock-quantity'>{str(stock['quantity'])} shares</span></div>"
         stock_item_html += "<ul class='news-list'>"
         
         if stock['news']:
@@ -56,7 +60,6 @@ def get_email_body(stock_data):
         
         stock_item_html += "</ul></div>"
         stock_list_items += stock_item_html
-    
     with open('email_template.html', 'r') as file:
         BODY_HTML = file.read()
 
