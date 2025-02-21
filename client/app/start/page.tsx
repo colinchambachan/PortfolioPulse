@@ -113,7 +113,7 @@ export default function Start() {
               Accept: "application/json",
             },
             mode: "cors",
-            credentials: "omit",
+            credentials: "include",
           }
         );
 
@@ -302,71 +302,103 @@ export default function Start() {
                 </div>
 
                 {isLoading && (
-                  <div className="flex justify-center">
-                    <span className="loading loading-dots loading-md"></span>
+                  <div className="flex flex-col items-center justify-center space-y-3 my-8 bg-white/50 backdrop-blur-sm rounded-lg p-6">
+                    <div className="relative">
+                      <div className="w-12 h-12 border-4 border-purple-200 rounded-full animate-spin border-t-purple-600"></div>
+                      <div className="w-12 h-12 border-4 border-purple-600 rounded-full opacity-20 absolute top-0"></div>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-sm font-medium text-gray-900">
+                        Processing your portfolio...
+                      </p>
+                      <p className="text-xs text-gray-600 mt-1">
+                        This may take a few moments
+                      </p>
+                    </div>
                   </div>
                 )}
 
                 {/* Table */}
                 {Object.keys(data).length > 0 && (
-                  <div className="overflow-x-auto">
-                    <span className="text-sm font-medium text-gray-700 mb-1 flex items-center gap-2">
-                      Did we get these right?
-                    </span>
-                    <table className="table">
+                  <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
+                    <div className="mb-4">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-1">
+                        Did we get these right?
+                      </h3>
+                      <p className="text-sm text-gray-600">
+                        Review and edit your holdings below if needed.
+                      </p>
+                    </div>
+                    <table className="table w-full">
                       <thead>
-                        <tr>
-                          <th>Symbol</th>
-                          <th>Quantity</th>
-                          <th>Edit</th>
-                          <th>Delete</th>
+                        <tr className="border-b border-gray-200">
+                          <th className="text-left text-sm font-semibold text-gray-900 py-3">
+                            Symbol
+                          </th>
+                          <th className="text-left text-sm font-semibold text-gray-900">
+                            Quantity
+                          </th>
+                          <th className="text-center text-sm font-semibold text-gray-900">
+                            Edit
+                          </th>
+                          <th className="text-center text-sm font-semibold text-gray-900">
+                            Delete
+                          </th>
                         </tr>
                       </thead>
                       <tbody>
                         {Object.keys(data).map((symbol) => (
-                          <tr key={symbol}>
-                            <td>
+                          <tr
+                            key={symbol}
+                            className="border-b border-gray-100 hover:bg-gray-50"
+                          >
+                            <td className="py-3">
                               {editing === symbol ? (
                                 <input
                                   type="text"
-                                  className="bg-white border border-gray-300 p-1 w-16"
+                                  className="bg-white border border-purple-300 p-1.5 w-20 rounded focus:outline-none focus:ring-2 focus:ring-purple-500"
                                   value={newSymbol}
                                   onChange={(e) => setNewSymbol(e.target.value)}
                                 />
                               ) : (
-                                symbol
+                                <span className="font-medium">{symbol}</span>
                               )}
                             </td>
                             <td>
                               {editing === symbol ? (
                                 <input
                                   type="number"
-                                  className="bg-white border border-gray-300 p-1 w-32"
+                                  className="bg-white border border-purple-300 p-1.5 w-32 rounded focus:outline-none focus:ring-2 focus:ring-purple-500"
                                   value={newValue}
                                   onChange={(e) => setNewValue(e.target.value)}
                                 />
                               ) : (
-                                data[symbol]
+                                <span>{data[symbol]}</span>
                               )}
                             </td>
-                            <td className="w-24">
+                            <td className="text-center">
                               {editing === symbol ? (
                                 <button
-                                  className="btn btn-outline btn-xs"
+                                  className="px-3 py-1 text-sm bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors"
                                   onClick={handleSave}
                                 >
                                   Save
                                 </button>
                               ) : (
-                                <button onClick={() => handleEdit(symbol)}>
+                                <button
+                                  onClick={() => handleEdit(symbol)}
+                                  className="text-gray-600 hover:text-purple-600 transition-colors"
+                                  title="Edit"
+                                >
                                   <FaPencilAlt />
                                 </button>
                               )}
                             </td>
-                            <td className="w-24">
+                            <td className="text-center">
                               <button
-                                className="text-red-500"
+                                className="text-gray-400 hover:text-red-500 transition-colors"
                                 onClick={() => handleDelete(symbol)}
+                                title="Delete"
                               >
                                 <FaTimes />
                               </button>
@@ -384,9 +416,22 @@ export default function Start() {
                     <TooltipTrigger asChild>
                       <button
                         type="submit"
-                        className="w-full bg-purple-600 text-white px-4 py-3 rounded-lg hover:bg-purple-700 transition-all font-medium"
+                        disabled={isLoading}
+                        className={`w-full px-4 py-3 rounded-lg font-medium transition-all flex items-center justify-center space-x-2
+                          ${
+                            isLoading
+                              ? "bg-purple-400 cursor-not-allowed"
+                              : "bg-purple-600 hover:bg-purple-700"
+                          } text-white`}
                       >
-                        Submit & Start Workflow
+                        {isLoading ? (
+                          <>
+                            <div className="w-5 h-5 border-3 border-white/30 border-t-white rounded-full animate-spin"></div>
+                            <span>Processing...</span>
+                          </>
+                        ) : (
+                          "Submit & Start Workflow"
+                        )}
                       </button>
                     </TooltipTrigger>
                   </Tooltip>
