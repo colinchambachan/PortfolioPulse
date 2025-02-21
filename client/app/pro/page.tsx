@@ -97,7 +97,7 @@ export default function Pro() {
               className="text-purple-600 hover:underline"
             >
               <button className="w-full bg-white text-purple-600 px-6 py-3 rounded-lg hover:bg-gray-100 transition-all font-medium">
-                Coming soon (If you&apos;re interested, email us at
+                Coming soon (If interested, email us at
                 info.portfoliopulse@gmail.com )
               </button>
             </a>

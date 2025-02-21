@@ -69,7 +69,7 @@ export default function Landing() {
               <Image
                 width={600}
                 height={60}
-                src="/dashboard_preview3.png"
+                src="/dashboard_preview4.png"
                 alt="Portfolio Pulse Dashboard"
                 className="w-full h-auto rounded-xl"
               />

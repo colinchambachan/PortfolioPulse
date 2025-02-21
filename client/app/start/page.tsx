@@ -1,12 +1,12 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import AOS from "aos";
 import "aos/dist/aos.css";
-import {
-  Tooltip,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { FaPencilAlt, FaTimes } from "react-icons/fa";
+import { BsQuestionCircle } from "react-icons/bs";
+import Image from "next/image";
+import { useMutation } from "@tanstack/react-query";
+import { useToast } from "@/components/ui/use-toast";
 import {
   Dialog,
   DialogContent,
@@ -15,10 +15,12 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { FaPencilAlt, FaTimes } from "react-icons/fa";
-import { BsQuestionCircle } from "react-icons/bs";
-import Image from "next/image";
-import { useMutation } from "@tanstack/react-query";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface PortfolioData {
   [key: string]: number;
@@ -33,6 +35,11 @@ interface UploadError {
   status?: number;
 }
 
+interface CreateUserResponse {
+  success: boolean;
+  message: string;
+}
+
 export default function Start() {
   const [email, setEmail] = useState("");
   const [file, setFile] = useState<File | null>(null);
@@ -41,6 +48,9 @@ export default function Start() {
   const [newSymbol, setNewSymbol] = useState<string>(editing || "");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [data, setData] = useState<PortfolioData>({});
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const { toast } = useToast();
 
   // Function to trigger editing mode for a specific symbol
   const handleEdit = (symbol: string): void => {
@@ -80,15 +90,92 @@ export default function Start() {
     });
   };
 
-  const handleFormSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setTimeout(() => {
+  const resetForm = () => {
+    setEmail("");
+    setFile(null);
+    setEditing(null);
+    setNewValue("");
+    setNewSymbol("");
+    setData({});
+    setIsLoading(false);
+    // Reset the file input value
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
+  const createUserMutation = useMutation<
+    CreateUserResponse,
+    UploadError,
+    { email: string; portfolio: PortfolioData }
+  >({
+    mutationFn: async ({ email, portfolio }) => {
+      try {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/create-user`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json",
+            },
+            body: JSON.stringify({ email, portfolio }),
+            credentials: "include",
+          }
+        );
+
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(
+            errorData.message || `HTTP error! status: ${response.status}`
+          );
+        }
+
+        const responseData = await response.json();
+        return responseData;
+      } catch (error) {
+        console.error("Create user error:", error);
+        if (error instanceof Error) {
+          throw { message: error.message };
+        }
+        throw { message: "An unexpected error occurred" };
+      }
+    },
+    onSuccess: (data) => {
+      console.log("User created successfully:", data);
       setIsLoading(false);
-      console.log("Email:", email);
-      console.log("Data:", data);
-      alert("Submitted!");
-    }, 2000);
+      toast({
+        title: "Success! 🎉",
+        description:
+          "Your portfolio has been registered! See you tomorrow morning!",
+        duration: 5000,
+      });
+      resetForm();
+    },
+    onError: (error) => {
+      console.error("Failed to create user:", error);
+      setIsLoading(false);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error.message || "Failed to register. Please try again.",
+        duration: 5000,
+      });
+    },
+  });
+
+  const handleFormSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (Object.keys(data).length === 0) {
+      alert("Please upload and verify your portfolio first");
+      return;
+    }
+    setIsLoading(true);
+    try {
+      await createUserMutation.mutateAsync({ email, portfolio: data });
+    } catch (error) {
+      console.error("Error during user creation:", error);
+    }
   };
 
   useEffect(() => {
@@ -139,11 +226,23 @@ export default function Start() {
       console.log("Upload successful:", data);
       setData(data.extracted_text);
       setIsLoading(false);
+      // toast({
+      //   title: "Success",
+      //   description: "Portfolio document processed successfully!",
+      //   duration: 3000,
+      // });
     },
     onError: (error) => {
       console.error("Upload failed:", error);
       setIsLoading(false);
-      alert(`Failed to process document: ${error.message}`);
+      setFile(null); // Reset file state on error
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description:
+          error.message || "Failed to process document. Please try again.",
+        duration: 5000,
+      });
     },
   });
 
@@ -154,24 +253,38 @@ export default function Start() {
     if (uploadedFile) {
       const allowedTypes = ["application/pdf", "image/jpeg", "image/png"];
       if (!allowedTypes.includes(uploadedFile.type)) {
-        alert("Only PDF, JPG, and PNG files are allowed.");
+        toast({
+          variant: "destructive",
+          title: "Invalid File Type",
+          description: "Only PDF, JPG, and PNG files are allowed.",
+          duration: 5000,
+        });
+        event.target.value = ""; // Reset the input
         return;
       }
 
       if (uploadedFile.size > 1024 * 1024) {
         // 1MB
-        alert("File size must be less than 1MB");
+        toast({
+          variant: "destructive",
+          title: "File Too Large",
+          description: "File size must be less than 1MB",
+          duration: 5000,
+        });
+        event.target.value = ""; // Reset the input
         return;
       }
 
       setFile(uploadedFile);
       setIsLoading(true);
+      setData({}); // Reset data when uploading new file
 
       try {
         await uploadMutation.mutateAsync(uploadedFile);
       } catch (error) {
         // Error handling is done in onError callback
         console.error("Error during upload:", error);
+        event.target.value = ""; // Reset the input
       }
     }
   };
@@ -253,53 +366,55 @@ export default function Start() {
                       </DialogContent>
                     </Dialog>
                   </label>
-                  <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg hover:border-purple-500 transition-colors">
-                    <label
-                      htmlFor="file-upload"
-                      className="w-full h-full flex flex-col items-center justify-center space-y-1 text-center cursor-pointer"
-                    >
-                      <div className="space-y-1">
-                        <svg
-                          className="mx-auto h-12 w-12 text-gray-400"
-                          stroke="currentColor"
-                          fill="none"
-                          viewBox="0 0 48 48"
-                          aria-hidden="true"
-                        >
-                          <path
-                            d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
-                            strokeWidth={2}
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          />
-                        </svg>
-                        <div className="flex text-sm text-gray-600">
-                          <span className="font-medium text-purple-600 hover:text-purple-700">
-                            Click to Upload a File
-                          </span>
-                        </div>
-                        <p className="text-xs text-gray-500">
-                          PDF, PNG, JPG up to 1MB
-                        </p>
-                      </div>
-                      <input
-                        id="file-upload"
-                        name="file-upload"
-                        type="file"
-                        className="sr-only"
-                        accept=".pdf,.jpg,.png"
-                        onChange={handleFileUpload}
-                        required
-                      />
-                    </label>
-                  </div>
-
-                  {file && (
-                    <p className="mt-2 text-sm text-gray-600">
-                      Selected file: {file.name}
-                    </p>
-                  )}
                 </div>
+
+                <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg hover:border-purple-500 transition-colors">
+                  <label
+                    htmlFor="file-upload"
+                    className="w-full h-full flex flex-col items-center justify-center space-y-1 text-center cursor-pointer"
+                  >
+                    <div className="space-y-1">
+                      <svg
+                        className="mx-auto h-12 w-12 text-gray-400"
+                        stroke="currentColor"
+                        fill="none"
+                        viewBox="0 0 48 48"
+                        aria-hidden="true"
+                      >
+                        <path
+                          d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
+                          strokeWidth={2}
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                      <div className="flex text-sm text-gray-600">
+                        <span className="font-medium text-purple-600 hover:text-purple-700">
+                          Click to Upload a File
+                        </span>
+                      </div>
+                      <p className="text-xs text-gray-500">
+                        PDF, PNG, JPG up to 1MB
+                      </p>
+                    </div>
+                    <input
+                      id="file-upload"
+                      name="file-upload"
+                      type="file"
+                      className="sr-only"
+                      accept=".pdf,.jpg,.png"
+                      onChange={handleFileUpload}
+                      ref={fileInputRef}
+                      required
+                    />
+                  </label>
+                </div>
+
+                {file && (
+                  <p className="mt-2 text-sm text-gray-600">
+                    Selected file: {file.name}
+                  </p>
+                )}
 
                 {isLoading && (
                   <div className="flex flex-col items-center justify-center space-y-3 my-8 bg-white/50 backdrop-blur-sm rounded-lg p-6">
@@ -434,6 +549,9 @@ export default function Start() {
                         )}
                       </button>
                     </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Submit your portfolio to start receiving insights</p>
+                    </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
               </form>

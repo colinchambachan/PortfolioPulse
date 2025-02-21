@@ -1,5 +1,7 @@
+<!DOCTYPE html>
 <html>
   <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <style>
       @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap");
 
@@ -16,8 +18,9 @@
         color: #1f2937;
         line-height: 1.5;
       }
+
+      /* Remove the gradient header style */
       .header {
-        background: linear-gradient(to right, #6d28d9, #7c3aed);
         padding: 24px;
         text-align: center;
       }
@@ -154,9 +157,24 @@
     </style>
   </head>
   <body>
-    <div class="header">
-      <h1>{SUBJECT}</h1>
+    <!-- Outlook-specific wrapper -->
+    <!--[if mso]>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color: #6d28d9;">
+      <tr>
+        <td align="center" style="padding: 24px;">
+    <![endif]-->
+
+    <div class="header" style="background-color: #6d28d9">
+      <h1 style="color: white; font-size: 24px; font-weight: 600; margin: 0">
+        {SUBJECT}
+      </h1>
     </div>
+
+    <!--[if mso]>
+        </td>
+      </tr>
+    </table>
+    <![endif]-->
 
     <div class="container">
       <div class="intro">
