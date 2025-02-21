@@ -494,6 +494,7 @@ export default function Start() {
                             <td className="text-center">
                               {editing === symbol ? (
                                 <button
+                                  type="button"
                                   className="px-3 py-1 text-sm bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors"
                                   onClick={handleSave}
                                 >
@@ -501,6 +502,7 @@ export default function Start() {
                                 </button>
                               ) : (
                                 <button
+                                  type="button"
                                   onClick={() => handleEdit(symbol)}
                                   className="text-gray-600 hover:text-purple-600 transition-colors"
                                   title="Edit"
@@ -511,6 +513,7 @@ export default function Start() {
                             </td>
                             <td className="text-center">
                               <button
+                                type="button"
                                 className="text-gray-400 hover:text-red-500 transition-colors"
                                 onClick={() => handleDelete(symbol)}
                                 title="Delete"
