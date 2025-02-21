@@ -349,9 +349,9 @@ export default function Start() {
                           <DialogTitle>Portfolio Document Format</DialogTitle>
                           <DialogDescription>
                             Upload a clear image or PDF of your investment
-                            portfolio. The document should show your stock
-                            holdings with quantities. Please see the following
-                            example from Wealthsimple:
+                            portfolio. The document should show your holdings
+                            with quantities. Please see the following example
+                            from Wealthsimple:
                           </DialogDescription>
                         </DialogHeader>
                         <div className="mt-4 flex justify-center">
