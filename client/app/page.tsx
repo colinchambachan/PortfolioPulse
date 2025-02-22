@@ -15,10 +15,16 @@ import {
 export default function Landing() {
   useEffect(() => {
     AOS.init({
-      duration: 1000,
-      once: true,
-      disable: "mobile",
+      duration: 800,
+      once: false,
+      mirror: true,
+      offset: 50,
     });
+    AOS.refresh();
+
+    return () => {
+      AOS.refresh();
+    };
   }, []);
 
   return (
@@ -31,14 +37,26 @@ export default function Landing() {
 
         <div className="relative w-full max-w-7xl mx-auto px-4 sm:px-8 py-8 sm:py-0 flex flex-col md:grid md:grid-cols-2 gap-8 md:gap-12 items-center min-h-[calc(100vh-5rem)]">
           {/* Left side - Text content */}
-          <div className="flex flex-col items-center md:items-start text-center md:text-left z-10 mt-8 sm:mt-0">
-            <div className="inline-flex items-center gap-2 bg-purple-100 text-purple-700 px-4 py-2 rounded-full text-sm font-medium mb-6 animate-fade-in">
+          <div
+            className="flex flex-col items-center md:items-start text-center md:text-left z-10 mt-8 sm:mt-0"
+            data-aos="fade-up"
+            data-aos-delay="100"
+          >
+            <div
+              className="inline-flex items-center gap-2 bg-purple-100 text-purple-700 px-4 py-2 rounded-full text-sm font-medium mb-6"
+              data-aos="fade-up"
+              data-aos-delay="200"
+            >
               <BsLightningCharge className="text-purple-600" />
               <span className="whitespace-nowrap">
                 Automated Market Intelligence
               </span>
             </div>
-            <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
+            <h1
+              className="text-3xl sm:text-4xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight"
+              data-aos="fade-up"
+              data-aos-delay="300"
+            >
               Your Portfolio,{" "}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-purple-400">
                 Smarter
@@ -46,11 +64,19 @@ export default function Landing() {
               <br className="hidden sm:block" />
               Every Morning
             </h1>
-            <p className="text-base sm:text-lg md:text-xl text-gray-600 mb-8 max-w-xl">
+            <p
+              className="text-base sm:text-lg md:text-xl text-gray-600 mb-8 max-w-xl"
+              data-aos="fade-up"
+              data-aos-delay="400"
+            >
               PortfolioPulse delivers data-driven market insights based on your
               investments, straight to your inbox before market open.
             </p>
-            <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
+            <div
+              className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto"
+              data-aos="fade-up"
+              data-aos-delay="500"
+            >
               <Link href="start" className="w-full sm:w-auto">
                 <button className="w-full sm:w-auto group bg-purple-600 text-white px-6 md:px-8 py-3 md:py-4 rounded-lg shadow-lg hover:bg-purple-700 transition-all text-lg font-medium inline-flex items-center justify-center gap-2">
                   Get Started Free
@@ -62,7 +88,11 @@ export default function Landing() {
           </div>
 
           {/* Right side - Image */}
-          <div className="relative z-10 w-full max-w-[350px] sm:max-w-[400px] md:max-w-[450px] mx-auto mt-8 md:mt-0">
+          <div
+            className="relative z-10 w-full max-w-[350px] sm:max-w-[400px] md:max-w-[450px] mx-auto mt-8 md:mt-0"
+            data-aos="fade-left"
+            data-aos-delay="300"
+          >
             <div className="relative bg-white p-2 rounded-2xl shadow-[0_20px_50px_rgba(8,_112,_184,_0.7)]">
               <Image
                 width={600}
