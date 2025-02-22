@@ -523,8 +523,125 @@ export default function Start() {
                             </td>
                           </tr>
                         ))}
+                        {editing === "new" && (
+                          <tr className="border-b border-gray-100 bg-purple-50/50">
+                            <td className="py-3">
+                              <input
+                                type="text"
+                                className="bg-white border border-purple-300 p-1.5 w-20 rounded focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                value={newSymbol}
+                                onChange={(e) => setNewSymbol(e.target.value)}
+                                placeholder="AAPL"
+                                autoFocus
+                              />
+                            </td>
+                            <td>
+                              <input
+                                type="number"
+                                className="bg-white border border-purple-300 p-1.5 w-32 rounded focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                value={newValue}
+                                onChange={(e) => setNewValue(e.target.value)}
+                                placeholder="100"
+                              />
+                            </td>
+                            <td className="text-center">
+                              <button
+                                type="button"
+                                className="px-3 py-1 text-sm bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors"
+                                onClick={handleSave}
+                              >
+                                Save
+                              </button>
+                            </td>
+                            <td className="text-center">
+                              <button
+                                type="button"
+                                className="text-gray-400 hover:text-red-500 transition-colors"
+                                onClick={() => {
+                                  setEditing(null);
+                                  setNewSymbol("");
+                                  setNewValue("");
+                                }}
+                                title="Cancel"
+                              >
+                                <FaTimes />
+                              </button>
+                            </td>
+                          </tr>
+                        )}
                       </tbody>
                     </table>
+
+                    <div className="mt-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+                      <div className="flex items-center gap-2">
+                        {Object.keys(data).length < 10 && !editing && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setEditing("new");
+                              setNewSymbol("");
+                              setNewValue("");
+                            }}
+                            className="inline-flex items-center gap-2 text-sm text-purple-600 hover:text-purple-700 font-medium"
+                          >
+                            <svg
+                              className="w-5 h-5"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M12 4v16m8-8H4"
+                              />
+                            </svg>
+                            Add Symbol
+                          </button>
+                        )}
+                      </div>
+                      <div className="text-sm text-gray-500 flex items-center gap-2">
+                        <span className="flex items-center gap-1">
+                          <span className="font-medium text-gray-700">
+                            {Object.keys(data).length}
+                          </span>{" "}
+                          / 10 symbols
+                        </span>
+                        {Object.keys(data).length > 3 && (
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <span className="inline-flex items-center gap-1 bg-purple-100 text-purple-700 px-2 py-1 rounded-full text-xs hover:bg-purple-200 transition-colors cursor-pointer">
+                                  <svg
+                                    className="w-3 h-3"
+                                    fill="currentColor"
+                                    viewBox="0 0 20 20"
+                                  >
+                                    <path
+                                      fillRule="evenodd"
+                                      d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
+                                      clipRule="evenodd"
+                                    />
+                                  </svg>
+                                  Free tier limited to first 3
+                                </span>
+                              </TooltipTrigger>
+                              <TooltipContent className="max-w-[250px] text-xs">
+                                <p>
+                                  While you can track up to 10 symbols, the free
+                                  tier will only analyze and send insights for
+                                  your 3 holdings with updates. Upgrade to Pro
+                                  to unlock insights for all your symbols. This
+                                  is done to manage internal costs and
+                                  resources.
+                                </p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        )}
+                      </div>
+                    </div>
                   </div>
                 )}
 
