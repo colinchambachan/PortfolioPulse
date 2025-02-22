@@ -14,6 +14,7 @@ from slowapi import Limiter
 from slowapi.util import get_remote_address
 from slowapi.middleware import SlowAPIMiddleware
 from slowapi.errors import RateLimitExceeded
+import env 
 
 app = FastAPI()
 
@@ -44,7 +45,12 @@ def get_aws_credentials():
 
 def get_ddb_connection():
     aws_access_key_id, aws_secret_access_key, region = get_aws_credentials()
-    dynamodb = boto3.resource('dynamodb', region_name=region, aws_access_key_id=aws_access_key_id, aws_secret_access_key=aws_secret_access_key)
+    dynamodb = boto3.resource(
+        'dynamodb',
+        region_name=region,
+        aws_access_key_id=aws_access_key_id,
+        aws_secret_access_key=aws_secret_access_key
+    )
     return dynamodb
 
 @app.get("/")
@@ -56,7 +62,9 @@ def read_root(request: Request, user: Union[str, None] = None):
 @limiter.limit("2/minute")
 async def create_user(request: Request, obj: dict):
     try:
+        print("before")
         ddb = get_ddb_connection()
+        print("after")
         TABLE_NAME = os.getenv("TABLE_NAME")
         table = ddb.Table(TABLE_NAME)
         for symbol, quantity in obj["portfolio"].items():
@@ -65,18 +73,20 @@ async def create_user(request: Request, obj: dict):
                     Item={
                         "user": obj["email"],
                         "quantity": Decimal(str(quantity)),
-                        "symbol": str(symbol)
+                        "symbol": str(symbol),
+                        "unique_key": f"{obj['email']}_{symbol}"
                     },
-                    ConditionExpression="attribute_not_exists(user) AND attribute_not_exists(symbol)"
+                    ConditionExpression="attribute_not_exists(unique_key)"
                 )
             except ddb.meta.client.exceptions.ConditionalCheckFailedException:
-                raise HTTPException(status_code=400, detail=f"Item with user {obj['email']} and symbol {symbol} already exists")
+                continue
         return {"message": "User created successfully!"}
     except Exception as error:
-        return {"error": str(error)}
+        HTTPException(status_code=404, detail=str(error))
+        # return {"error": str(error)}
 
 @app.delete("/user")
-@limiter.limit("2/minute")
+@limiter.limit("5/minute")
 async def delete_user(request: Request, email: str):
     try:
         ddb = get_ddb_connection()
@@ -88,12 +98,15 @@ async def delete_user(request: Request, email: str):
                 if each['user'] == email:
                     batch.delete_item(Key={
                         "user": email,
-                        "quantity": each['quantity']
+                        "quantity": each['quantity'],
+                        # "symbol": each['symbol'],
+                        # "unique_key": each['unique_key']
                     })
         response = {"message": f"All items with user {email} have been deleted."}
         return response
     except Exception as error:
-        return {"error": str(error)}
+        HTTPException(status_code=404, detail=str(error))
+        # return {"error": str(error)}
 
 def extract_stock_data(text: str):
     stock_data = {}
