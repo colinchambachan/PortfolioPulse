@@ -112,7 +112,7 @@ export default function Start() {
     mutationFn: async ({ email, portfolio }) => {
       try {
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/create-user`,
+          `${process.env.NEXT_PUBLIC_API_URL}/user`,
           {
             method: "POST",
             headers: {
