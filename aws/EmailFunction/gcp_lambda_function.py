@@ -126,27 +126,30 @@ def lambda_handler(event, context):
 
     try:
         table = dynamodb_resource.Table(TABLE_NAME)
-        filtering_exp = Key("user").eq("colin.chambachan@gmail.com")
-        response = table.scan(FilterExpression=filtering_exp)
-        sorted_items = sorted(response['Items'], key=lambda x: x['quantity'], reverse=True)
-
-        stock_data = []
-        for item in sorted_items:
-            temp = {
-                "symbol": item["symbol"],
-                "quantity": item["quantity"],
-                "news": get_headlines(item["symbol"], finnhub_client),
-            }
-            stock_data.append(temp)
-
-        SUBJECT, BODY_TEXT, BODY_HTML = get_email_body(stock_data)
-
-        # oauth access token 
+        response = table.scan()
+        users = {item['user'] for item in response['Items']}  # Get unique users
+       
+        # oauth access token
         access_token = refresh_access_token(CLIENT_ID, CLIENT_SECRET, REFRESH_TOKEN)
+        
+        for user in users:
+            filtering_exp = Key("user").eq(user)
+            user_response = table.scan(FilterExpression=filtering_exp)
+            sorted_items = sorted(user_response['Items'], key=lambda x: x['quantity'], reverse=True)
 
-        # send email via gmail api
-        return send_email_via_gmail_oauth(SUBJECT, BODY_TEXT, BODY_HTML, RECIPIENT, SENDER, access_token)
+            stock_data = []
+            for item in sorted_items:
+                temp = {
+                    "symbol": item["symbol"],
+                    "quantity": item["quantity"],
+                    "news": get_headlines(item["symbol"], finnhub_client),
+                }
+                stock_data.append(temp)
 
-    except ClientError as e:
-        print(e.response['Error']['Message'])
-        return "Failed to process the request."
+            SUBJECT, BODY_TEXT, BODY_HTML = get_email_body(stock_data)
+
+            send_email_via_gmail_oauth(SUBJECT, BODY_TEXT, BODY_HTML, user, SENDER, access_token)
+
+        return {"message": "Emails sent successfully!"}
+    except Exception as error:
+        return {"error": str(error)}
