@@ -21,11 +21,11 @@ app = FastAPI()
 limiter = Limiter(key_func=get_remote_address)
 
 # Add the SlowAPI middleware
+app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, lambda request, exc: JSONResponse(
     status_code=429,
-    content={"message": f"Rate limit exceeded: {exc.detail}"}
+    content={"message": "Rate limit exceeded"}
 ))
-
 app.add_middleware(SlowAPIMiddleware)
 
 app.add_middleware(
@@ -49,12 +49,12 @@ def get_ddb_connection():
 
 @app.get("/")
 @limiter.limit("5/minute")
-def read_root(user: Union[str, None] = None):
+def read_root(request: Request, user: Union[str, None] = None):
     return {"Hello": user}
 
 @app.post("/user")
 @limiter.limit("2/minute")
-async def create_user(obj: dict):
+async def create_user(request: Request, obj: dict):
     try:
         ddb = get_ddb_connection()
         TABLE_NAME = os.getenv("TABLE_NAME")
@@ -67,17 +67,17 @@ async def create_user(obj: dict):
                         "quantity": Decimal(str(quantity)),
                         "symbol": str(symbol)
                     },
-                    ConditionExpression="attribute_not_exists(user) AND attribute_not_exists(quantity) AND attribute_not_exists(symbol)"
+                    ConditionExpression="attribute_not_exists(user) AND attribute_not_exists(symbol)"
                 )
             except ddb.meta.client.exceptions.ConditionalCheckFailedException:
-                continue
+                raise HTTPException(status_code=400, detail=f"Item with user {obj['email']} and symbol {symbol} already exists")
         return {"message": "User created successfully!"}
     except Exception as error:
-        return {"error": str(error)}    
+        return {"error": str(error)}
 
 @app.delete("/user")
 @limiter.limit("2/minute")
-async def delete_user(email: str):
+async def delete_user(request: Request, email: str):
     try:
         ddb = get_ddb_connection()
         TABLE_NAME = os.getenv("TABLE_NAME")
