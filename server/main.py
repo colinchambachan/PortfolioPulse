@@ -82,7 +82,7 @@ async def create_user(request: Request, obj: dict):
                 continue
         return {"message": "User created successfully!"}
     except Exception as error:
-        HTTPException(status_code=404, detail=str(error))
+        HTTPException(status_code=500, detail=str(error))
         # return {"error": str(error)}
 
 @app.delete("/user")
@@ -105,7 +105,7 @@ async def delete_user(request: Request, email: str):
         response = {"message": f"All items with user {email} have been deleted."}
         return response
     except Exception as error:
-        HTTPException(status_code=404, detail=str(error))
+        HTTPException(status_code=500, detail=str(error))
         # return {"error": str(error)}
 
 def extract_stock_data(text: str):
