@@ -1,6 +1,6 @@
-fastapi 
-uvicorn 
-pytesseract 
+fastapi[standard]
+uvicorn
+pytesseract
 pillow
 pdf2image
 boto3
