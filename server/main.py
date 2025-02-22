@@ -14,9 +14,12 @@ from slowapi import Limiter
 from slowapi.util import get_remote_address
 from slowapi.middleware import SlowAPIMiddleware
 from slowapi.errors import RateLimitExceeded
-import env 
+from dotenv import load_dotenv
 
 app = FastAPI()
+
+# Load environment variables from the .env file
+load_dotenv()
 
 # Initialize the Limiter
 limiter = Limiter(key_func=get_remote_address)

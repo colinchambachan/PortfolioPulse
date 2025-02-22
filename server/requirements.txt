@@ -5,3 +5,4 @@ pillow
 pdf2image
 boto3
 slowapi
+python-dotenv
