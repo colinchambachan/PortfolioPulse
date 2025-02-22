@@ -65,9 +65,7 @@ def read_root(request: Request, user: Union[str, None] = None):
 @limiter.limit("2/minute")
 async def create_user(request: Request, obj: dict):
     try:
-        print("before")
         ddb = get_ddb_connection()
-        print("after")
         TABLE_NAME = os.getenv("TABLE_NAME")
         table = ddb.Table(TABLE_NAME)
         for symbol, quantity in obj["portfolio"].items():
