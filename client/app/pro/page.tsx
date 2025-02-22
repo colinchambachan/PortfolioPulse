@@ -85,7 +85,7 @@ export default function Pro() {
               </div>
               <div className="flex items-center space-x-3">
                 <BsCheckLg className="text-white text-xl" />
-                <span>Unlimited Symbols tracked</span>
+                <span>10 Symbols tracked</span>
               </div>
               {/* <div className="flex items-center space-x-3">
                 <BsCheckLg className="text-white text-xl" />
