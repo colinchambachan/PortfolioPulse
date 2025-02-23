@@ -152,7 +152,7 @@ export default function Navbar() {
                     : "text-gray-700"
                 }`}
               >
-                <BsGear className="mr-2" />
+                {/* <BsGear className="mr-2" /> */}
                 Configure
               </Link>
             </li>
