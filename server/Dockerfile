@@ -32,6 +32,7 @@ RUN adduser \
 
 # Install Tesseract and Poppler
 RUN apt-get update && apt-get install -y \
+    libgl1-mesa-glx \
     tesseract-ocr \
     poppler-utils \
     && apt-get clean \
