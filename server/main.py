@@ -15,6 +15,8 @@ from slowapi.util import get_remote_address
 from slowapi.middleware import SlowAPIMiddleware
 from slowapi.errors import RateLimitExceeded
 from dotenv import load_dotenv
+import cv2
+import numpy as np
 
 app = FastAPI()
 
@@ -68,6 +70,7 @@ async def create_user(request: Request, obj: dict):
         ddb = get_ddb_connection()
         TABLE_NAME = os.getenv("TABLE_NAME")
         table = ddb.Table(TABLE_NAME)
+        # iterate over symbols and add to table accordinly
         for symbol, quantity in obj["portfolio"].items():
             try:
                 table.put_item(
@@ -77,13 +80,13 @@ async def create_user(request: Request, obj: dict):
                         "symbol": str(symbol),
                         "unique_key": f"{obj['email']}_{symbol}"
                     },
-                    ConditionExpression="attribute_not_exists(unique_key)"
+                    ConditionExpression="attribute_not_exists(unique_key)" # avoid collisions
                 )
             except ddb.meta.client.exceptions.ConditionalCheckFailedException:
                 continue
         return {"message": "User created successfully!"}
     except Exception as error:
-        HTTPException(status_code=500, detail=str(error))
+        raise HTTPException(status_code=500, detail=str(error))
         # return {"error": str(error)}
 
 @app.delete("/user")
@@ -94,6 +97,7 @@ async def delete_user(request: Request, email: str):
         TABLE_NAME = os.getenv("TABLE_NAME")
         table = ddb.Table(TABLE_NAME)
         scan = table.scan()
+        # Iterate over table and delete rows with inputted email
         with table.batch_writer() as batch:
             for each in scan['Items']:
                 if each['user'] == email:
@@ -106,14 +110,14 @@ async def delete_user(request: Request, email: str):
         response = {"message": f"All items with user {email} have been deleted."}
         return response
     except Exception as error:
-        HTTPException(status_code=500, detail=str(error))
+        raise HTTPException(status_code=500, detail=str(error))
         # return {"error": str(error)}
 
 def extract_stock_data(text: str):
     stock_data = {}
 
+    # Match stock symbols and quantities
     pattern = r"([A-Z]{2,4})\s+([\d,\.]+)"
-
     matches = re.findall(pattern, text)
 
     for match in matches:
@@ -122,28 +126,45 @@ def extract_stock_data(text: str):
     
     return stock_data
 
+def preprocess_image(image_bytes):
+    img_array = np.frombuffer(image_bytes, np.uint8)
+    img = cv2.imdecode(img_array, cv2.IMREAD_GRAYSCALE)
+
+    if img is None:
+        raise ValueError("Failed to load image for preprocessing")
+
+    # Denoise with minor Gaussian blur and adaptive threshold
+    img = cv2.GaussianBlur(img, (5, 5), 0)
+    img = cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, 
+                                cv2.THRESH_BINARY, 11, 2)
+
+    return img
+
 @app.post("/extract-symbols")
 async def create_upload_file(file: UploadFile):
-    file_data = await file.read() 
+    file_data = await file.read()
 
-    # Convert PDF pages to images
+    # Convert PDF to images
     if file.filename.endswith(".pdf"):
-        
         images = convert_from_bytes(file_data)
         extracted_text = ""
 
         for img in images:
-            extracted_text += pytesseract.image_to_string(img) + "\n"
-    
-    # Handle image files 
+            img_byte_array = io.BytesIO()
+            img.save(img_byte_array, format="PNG")
+            preprocessed_img = preprocess_image(img_byte_array.getvalue())
+            extracted_text += pytesseract.image_to_string(preprocessed_img) + "\n"
+
+    # Handle image files
     else:
         image = Image.open(io.BytesIO(file_data))
-        extracted_text = pytesseract.image_to_string(image)
+        
+        preprocessed_img = preprocess_image(file_data)
+        extracted_text = pytesseract.image_to_string(preprocessed_img)
 
     stock_data = extract_stock_data(extracted_text)
 
     return {"filename": file.filename, "extracted_text": stock_data}
-
 
 
 
