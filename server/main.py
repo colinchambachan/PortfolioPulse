@@ -36,7 +36,7 @@ app.add_middleware(SlowAPIMiddleware)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "https://portfoliopulse.xyz", "https://portfolio-pulse-nu.vercel.app"],
+    allow_origins=["http://localhost:3000", "https://portfoliopulse.xyz", "https://www.portfoliopulse.xyz", "https://portfolio-pulse-nu.vercel.app"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
