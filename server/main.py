@@ -33,11 +33,18 @@ app.add_exception_handler(RateLimitExceeded, lambda request, exc: JSONResponse(
     content={"message": "Rate limit exceeded"}
 ))
 
+allowed_origins = [
+    "http://localhost:3000",
+    "https://portfoliopulse.xyz",
+    "https://www.portfoliopulse.xyz",
+    "https://portfolio-pulse-nu.vercel.app",
+    "https://www.portfolio-pulse-nu.vercel.app"
+]
 
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "https://portfoliopulse.xyz", "https://www.portfoliopulse.xyz", "https://portfolio-pulse-nu.vercel.app"],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
