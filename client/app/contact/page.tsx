@@ -3,7 +3,7 @@ import React from "react";
 const ContactPage: React.FC = () => {
   return (
     <div
-      className="flex flex-col items-center justify-center text-center py-20 min-h-screen"
+      className="flex flex-col items-center justify-center text-center min-h-screen"
       data-aos="fade-up"
       //   data-aos-once="true"
     >
