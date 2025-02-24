@@ -2,7 +2,7 @@
 *.zip
 **/libraries/*
 */.aws-sam
-/__pycache__/*
+**/__pycache__/*
 
 *.jpg
 **DS_Store
