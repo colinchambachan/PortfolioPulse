@@ -32,7 +32,8 @@ app.add_exception_handler(RateLimitExceeded, lambda request, exc: JSONResponse(
     status_code=429,
     content={"message": "Rate limit exceeded"}
 ))
-app.add_middleware(SlowAPIMiddleware)
+
+
 
 app.add_middleware(
     CORSMiddleware,
@@ -41,6 +42,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+app.add_middleware(SlowAPIMiddleware)
 
 def get_aws_credentials():
     aws_access_key_id = os.getenv("AWS_ACCESS_KEY_ID")
