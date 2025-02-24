@@ -427,7 +427,7 @@ export default function Start() {
                         Processing your portfolio...
                       </p>
                       <p className="text-xs text-gray-600 mt-1">
-                        This may take a few moments
+                        This may take a few moments (Est. 3 mins)
                       </p>
                     </div>
                   </div>

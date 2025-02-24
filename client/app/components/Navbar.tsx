@@ -34,7 +34,7 @@ export default function Navbar() {
         </Link>
         <Link
           href="/"
-          className="text-xl ms-[-1rem] font-bold text-gray-900 rounded-lg hidden sm:block"
+          className="text-xl ms-[-0.5rem] font-bold text-gray-900 rounded-lg hidden sm:block"
         >
           PortfolioPulse
         </Link>
