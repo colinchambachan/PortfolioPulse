@@ -167,7 +167,12 @@ export default function Start() {
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (Object.keys(data).length === 0) {
-      alert("Please upload and verify your portfolio first");
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Please upload and verify your portfolio first",
+        duration: 5000,
+      });
       return;
     }
     setIsLoading(true);
@@ -251,41 +256,72 @@ export default function Start() {
   ) => {
     const uploadedFile = event.target.files?.[0];
     if (uploadedFile) {
-      const allowedTypes = ["application/pdf", "image/jpeg", "image/png"];
-      if (!allowedTypes.includes(uploadedFile.type)) {
-        toast({
-          variant: "destructive",
-          title: "Invalid File Type",
-          description: "Only PDF, JPG, and PNG files are allowed.",
-          duration: 5000,
-        });
-        event.target.value = ""; // Reset the input
-        return;
-      }
+      handleFileProcessing(uploadedFile);
+    }
+  };
 
-      if (uploadedFile.size > 1024 * 1024) {
-        // 1MB
-        toast({
-          variant: "destructive",
-          title: "File Too Large",
-          description: "File size must be less than 1MB",
-          duration: 5000,
-        });
-        event.target.value = ""; // Reset the input
-        return;
+  const handleFileProcessing = async (uploadedFile: File) => {
+    const allowedTypes = ["application/pdf", "image/jpeg", "image/png"];
+    if (!allowedTypes.includes(uploadedFile.type)) {
+      toast({
+        variant: "destructive",
+        title: "Invalid File Type",
+        description: "Only PDF, JPG, and PNG files are allowed.",
+        duration: 5000,
+      });
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
       }
+      return;
+    }
 
-      setFile(uploadedFile);
+    if (uploadedFile.size > 1024 * 1024) {
+      // 1MB
+      toast({
+        variant: "destructive",
+        title: "File Too Large",
+        description: "File size must be less than 1MB",
+        duration: 5000,
+      });
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+      return;
+    }
+
+    setFile(uploadedFile);
+    setIsLoading(true);
+    setData({}); // Reset data when uploading new file
+
+    try {
+      await uploadMutation.mutateAsync(uploadedFile);
+    } catch (error) {
+      // Error handling is done in onError callback
+      console.error("Error during upload:", error);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    }
+  };
+
+  const handleUseSample = async () => {
+    try {
       setIsLoading(true);
-      setData({}); // Reset data when uploading new file
-
-      try {
-        await uploadMutation.mutateAsync(uploadedFile);
-      } catch (error) {
-        // Error handling is done in onError callback
-        console.error("Error during upload:", error);
-        event.target.value = ""; // Reset the input
-      }
+      const response = await fetch("/sample_portfolio.pdf");
+      const blob = await response.blob();
+      const file = new File([blob], "sample_portfolio.pdf", {
+        type: "application/pdf",
+      });
+      handleFileProcessing(file);
+    } catch (error) {
+      console.error("Error loading sample:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to load sample portfolio. Please try again.",
+        duration: 5000,
+      });
+      setIsLoading(false);
     }
   };
 
@@ -301,7 +337,7 @@ export default function Start() {
                   Get Started
                 </h1>
                 <p className="text-gray-600">
-                  Upload your portfolio document and start receiving insights
+                  Upload your portfolio statement and start receiving insights
                 </p>
               </div>
 
@@ -368,46 +404,122 @@ export default function Start() {
                   </label>
                 </div>
 
-                <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg hover:border-purple-500 transition-colors">
-                  <label
-                    htmlFor="file-upload"
-                    className="w-full h-full flex flex-col items-center justify-center space-y-1 text-center cursor-pointer"
-                  >
-                    <div className="space-y-1">
+                <div className="mt-1 flex flex-col gap-4">
+                  <div className="flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg hover:border-purple-500 transition-colors">
+                    <label
+                      htmlFor="file-upload"
+                      className="w-full h-full flex flex-col items-center justify-center space-y-1 text-center cursor-pointer"
+                    >
+                      <div className="space-y-1">
+                        <svg
+                          className="mx-auto h-12 w-12 text-gray-400"
+                          stroke="currentColor"
+                          fill="none"
+                          viewBox="0 0 48 48"
+                          aria-hidden="true"
+                        >
+                          <path
+                            d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
+                            strokeWidth={2}
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                        <div className="flex text-sm text-gray-600">
+                          <span className="font-medium text-purple-600 hover:text-purple-700">
+                            Click to Upload a File
+                          </span>
+                        </div>
+                        <p className="text-xs text-gray-500">
+                          PDF, PNG, JPG up to 1MB
+                        </p>
+                      </div>
+                      <input
+                        id="file-upload"
+                        name="file-upload"
+                        type="file"
+                        className="sr-only"
+                        accept=".pdf,.jpg,.png"
+                        onChange={handleFileUpload}
+                        ref={fileInputRef}
+                      />
+                    </label>
+                  </div>
+
+                  <div className="flex items-center justify-center">
+                    <div className="flex items-center gap-2">
+                      <div className="h-px w-16 bg-gray-200"></div>
+                      <span className="text-sm text-gray-500">or</span>
+                      <div className="h-px w-16 bg-gray-200"></div>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={handleUseSample}
+                      className="flex-1 px-4 py-2 text-sm font-medium text-purple-600 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors flex items-center justify-center gap-2"
+                    >
                       <svg
-                        className="mx-auto h-12 w-12 text-gray-400"
-                        stroke="currentColor"
+                        className="w-4 h-4"
                         fill="none"
-                        viewBox="0 0 48 48"
-                        aria-hidden="true"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
                       >
                         <path
-                          d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
-                          strokeWidth={2}
                           strokeLinecap="round"
                           strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
                         />
                       </svg>
-                      <div className="flex text-sm text-gray-600">
-                        <span className="font-medium text-purple-600 hover:text-purple-700">
-                          Click to Upload a File
-                        </span>
-                      </div>
-                      <p className="text-xs text-gray-500">
-                        PDF, PNG, JPG up to 1MB
-                      </p>
-                    </div>
-                    <input
-                      id="file-upload"
-                      name="file-upload"
-                      type="file"
-                      className="sr-only"
-                      accept=".pdf,.jpg,.png"
-                      onChange={handleFileUpload}
-                      ref={fileInputRef}
-                      required
-                    />
-                  </label>
+                      Use Sample Portfolio
+                    </button>
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <button
+                          type="button"
+                          className="p-2 text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors flex items-center justify-center"
+                          title="Preview Sample Portfolio"
+                        >
+                          <svg
+                            className="w-5 h-5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                            />
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                            />
+                          </svg>
+                        </button>
+                      </DialogTrigger>
+                      <DialogContent className="sm:max-w-[600px] w-[90vw]">
+                        <DialogHeader>
+                          <DialogTitle>Sample Portfolio Preview</DialogTitle>
+                          <DialogDescription>
+                            This is the sample portfolio with 3 holdings, feel
+                            free to test with it first!
+                          </DialogDescription>
+                        </DialogHeader>
+                        <div className="mt-4 flex justify-center h-[600px]">
+                          <iframe
+                            src="/sample.pdf"
+                            className="w-full h-full rounded-lg border border-gray-200"
+                          />
+                        </div>
+                      </DialogContent>
+                    </Dialog>
+                  </div>
                 </div>
 
                 {file && (
