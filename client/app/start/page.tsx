@@ -337,7 +337,7 @@ export default function Start() {
                   Get Started
                 </h1>
                 <p className="text-gray-600">
-                  Upload your portfolio document and start receiving insights
+                  Upload your portfolio statement and start receiving insights
                 </p>
               </div>
 
