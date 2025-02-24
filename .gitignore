@@ -3,7 +3,7 @@
 **/libraries/*
 */.aws-sam
 /__pycache__/*
-*.pdf
+
 *.jpg
 **DS_Store
 
