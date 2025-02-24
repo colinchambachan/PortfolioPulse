@@ -134,9 +134,9 @@ def preprocess_image(image_bytes):
         raise ValueError("Failed to load image for preprocessing")
 
     # Denoise with minor Gaussian blur and adaptive threshold
-    img = cv2.GaussianBlur(img, (5, 5), 0)
-    img = cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, 
-                                cv2.THRESH_BINARY, 11, 2)
+    img = cv2.GaussianBlur(img, (3, 3), 0)
+    # img = cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, 
+    #                             cv2.THRESH_BINARY, 11, 2)
 
     return img
 
