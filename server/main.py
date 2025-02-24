@@ -67,6 +67,13 @@ def get_ddb_connection():
     )
     return dynamodb
 
+
+@app.middleware("http")
+async def debug_middleware(request: Request, call_next):
+    print(f"Request origin: {request.headers.get('origin')}")
+    response = await call_next(request)
+    return response
+
 @app.get("/")
 @limiter.limit("5/minute")
 def read_root(request: Request, user: Union[str, None] = None):
