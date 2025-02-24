@@ -1,6 +1,6 @@
-"use client"
-
-import { useToast } from "@/hooks/use-toast"
+"use client";
+// @ts-expect-error: useToast is not typed correctly
+import { useToast } from "@/hooks/use-toast";
 import {
   Toast,
   ToastClose,
@@ -8,10 +8,10 @@ import {
   ToastProvider,
   ToastTitle,
   ToastViewport,
-} from "@/components/ui/toast"
+} from "@/components/ui/toast";
 
 export function Toaster() {
-  const { toasts } = useToast()
+  const { toasts }: { toasts: Array<{ id: string; title?: string; description?: string; action?: React.ReactNode; [key: string]: any }> } = useToast();
 
   return (
     <ToastProvider>
@@ -27,9 +27,9 @@ export function Toaster() {
             {action}
             <ToastClose />
           </Toast>
-        )
+        );
       })}
       <ToastViewport />
     </ToastProvider>
-  )
+  );
 }
