@@ -307,9 +307,9 @@ export default function Start() {
   const handleUseSample = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch("/sample_portfolio.pdf");
+      const response = await fetch("/sample.pdf");
       const blob = await response.blob();
-      const file = new File([blob], "sample_portfolio.pdf", {
+      const file = new File([blob], "sample.pdf", {
         type: "application/pdf",
       });
       handleFileProcessing(file);
