@@ -1,7 +1,7 @@
 # [Portfolio Pulse](https://www.portfoliopulse.xyz)
 
 _Daily stock insights right to your inbox with the quick scan of a PDF_
-[https://www.portfoliopulse.xyz)(https://www.portfoliopulse.xyz)
+[https://www.portfoliopulse.xyz](https://www.portfoliopulse.xyz)
 
 ## Description
 
