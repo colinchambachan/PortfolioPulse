@@ -390,9 +390,9 @@ export default function Start() {
                             from Wealthsimple:
                           </DialogDescription>
                         </DialogHeader>
-                        <div className="mt-4 flex justify-center">
+                        <div className="mt-4 h-full flex justify-center">
                           <Image
-                            src="/example_portfolio.png"
+                            src="/redacted.png"
                             alt="Example portfolio document"
                             width={450}
                             height={200}
