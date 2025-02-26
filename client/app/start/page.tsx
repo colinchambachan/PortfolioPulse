@@ -307,12 +307,31 @@ export default function Start() {
   const handleUseSample = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch("/sample.pdf");
-      const blob = await response.blob();
-      const file = new File([blob], "sample.pdf", {
-        type: "application/pdf",
+      // const response = await fetch("/sample.pdf");
+      // const blob = await response.blob();
+      // const file = new File([blob], "sample.pdf", {
+      //   type: "application/pdf",
+      // });
+      // handleFileProcessing(file);
+
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      const sampleData = {
+        KO: 20,
+        AAPL: 10,
+        NVDA: 5,
+      };
+
+      setData(sampleData);
+      setFile(
+        new File([""], "sample_portfolio.pdf", { type: "application/pdf" })
+      );
+      setIsLoading(false);
+
+      toast({
+        title: "Success",
+        description: "Sample portfolio loaded successfully!",
+        duration: 3000,
       });
-      handleFileProcessing(file);
     } catch (error) {
       console.error("Error loading sample:", error);
       toast({
