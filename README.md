@@ -51,7 +51,7 @@ PortfolioPulse reshapes how you stay informed about your investments. Every morn
 5. Daily at 6 AM, EmailFunction Lambda:
    - Retrieves stored symbols
    - Fetches relevant news via News API
-   - Delivers personalized insights via SES
+   - Delivers personalized insights via SES (Gmail SMTP in user-facing version)
 
 ## Roadmap
 
