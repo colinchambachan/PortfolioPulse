@@ -20,13 +20,10 @@ import numpy as np
 
 app = FastAPI()
 
-# Load environment variables from the .env file
 load_dotenv()
 
-# Initialize the Limiter
 limiter = Limiter(key_func=get_remote_address)
 
-# Add the SlowAPI middleware
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, lambda request, exc: JSONResponse(
     status_code=429,
