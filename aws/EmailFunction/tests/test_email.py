@@ -7,7 +7,7 @@ ses = boto3.client('ses', region_name=region)
 
 try:
     response = ses.send_email(
-        Source='soccerdude1312@gmail.com',
+        Source='colin.chambachan@gmail.com',
         Destination={
             'ToAddresses': [
                 'colin.chambachan@gmail.com',
