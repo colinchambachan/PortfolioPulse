@@ -178,7 +178,7 @@ export default function Landing() {
             <Image
               src="/wealthsimple.png"
               alt="Wealthsimple"
-              width={120}
+              width={1200}
               height={40}
               className="h-6 sm:h-8 w-auto opacity-50 hover:opacity-100 transition-opacity"
             />
