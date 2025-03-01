@@ -29,11 +29,12 @@ PortfolioPulse reshapes how you stay informed about your investments. Every morn
 - Next.js 14
 - TypeScript
 - Tailwind CSS
-- Shadcn/ui
+- Shadcn
 
 ### Backend
 
 - FastAPI (Python)
+- OpenCV
 - AWS Services:
   - Lambda
   - SES (Simple Email Service)
@@ -41,6 +42,7 @@ PortfolioPulse reshapes how you stay informed about your investments. Every morn
   - S3
   - DynamoDB
   - Textract
+- Docker
 
 ## Workflow
 
