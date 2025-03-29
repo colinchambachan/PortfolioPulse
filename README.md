@@ -61,6 +61,7 @@ PortfolioPulse reshapes how you stay informed about your investments. Every morn
 - [x] Email UI enhancements
 - [ ] Portfolio performance analytics
 - [ ] GenAI Recommendations, Summaries and insights
+- [ ] (Mar 2025 - Accepted to Microsoft for Startup Founders) Migrate to Azure Services
 
 ## Contact
 
