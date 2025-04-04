@@ -46,6 +46,8 @@ PortfolioPulse reshapes how you stay informed about your investments. Every morn
 
 ## Workflow
 
+<img src="client\public\awsdiagram.png" alt="AWS Architecture Diagram" width="1200"/>
+
 1. User uploads portfolio statement (PDF)
 2. SymbolDetection Lambda analyzes document via Textract (Tesseract in user-facing version)
 3. Textract processes document and notifies SNS
