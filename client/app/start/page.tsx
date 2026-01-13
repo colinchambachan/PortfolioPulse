@@ -7,6 +7,7 @@ import { BsQuestionCircle } from "react-icons/bs";
 import Image from "next/image";
 import { useMutation } from "@tanstack/react-query";
 import { useToast } from "@/components/ui/use-toast";
+import { useUser } from "@clerk/nextjs";
 import {
   Dialog,
   DialogContent,
@@ -41,7 +42,7 @@ interface CreateUserResponse {
 }
 
 export default function Start() {
-  const [email, setEmail] = useState("");
+  const { user, isLoaded } = useUser();
   const [file, setFile] = useState<File | null>(null);
   const [editing, setEditing] = useState<string | null>(null);
   const [newValue, setNewValue] = useState<number | string>("");
@@ -51,6 +52,9 @@ export default function Start() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { toast } = useToast();
+
+  // Get email from Clerk user
+  const email = user?.primaryEmailAddress?.emailAddress || "";
 
   // Function to trigger editing mode for a specific symbol
   const handleEdit = (symbol: string): void => {
@@ -91,7 +95,6 @@ export default function Start() {
   };
 
   const resetForm = () => {
-    setEmail("");
     setFile(null);
     setEditing(null);
     setNewValue("");
@@ -107,9 +110,14 @@ export default function Start() {
   const createUserMutation = useMutation<
     CreateUserResponse,
     UploadError,
-    { email: string; portfolio: PortfolioData }
+    {
+      email: string;
+      portfolio: PortfolioData;
+      clerkId: string;
+      tier: "free" | "pro";
+    }
   >({
-    mutationFn: async ({ email, portfolio }) => {
+    mutationFn: async ({ email, portfolio, clerkId, tier }) => {
       try {
         const response = await fetch(
           `${process.env.NEXT_PUBLIC_API_URL}/user`,
@@ -119,7 +127,7 @@ export default function Start() {
               "Content-Type": "application/json",
               Accept: "application/json",
             },
-            body: JSON.stringify({ email, portfolio }),
+            body: JSON.stringify({ email, portfolio, clerk_id: clerkId, tier }),
             credentials: "include",
           }
         );
@@ -175,9 +183,23 @@ export default function Start() {
       });
       return;
     }
+    if (!user?.id) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Please sign in to continue",
+        duration: 5000,
+      });
+      return;
+    }
     setIsLoading(true);
     try {
-      await createUserMutation.mutateAsync({ email, portfolio: data });
+      await createUserMutation.mutateAsync({
+        email,
+        portfolio: data,
+        clerkId: user.id,
+        tier: "free", // Default to free tier for new signups
+      });
     } catch (error) {
       console.error("Error during user creation:", error);
     }
@@ -344,6 +366,15 @@ export default function Start() {
     }
   };
 
+  // Show loading while Clerk loads
+  if (!isLoaded) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="w-12 h-12 border-4 border-purple-200 rounded-full animate-spin border-t-purple-600"></div>
+      </div>
+    );
+  }
+
   return (
     <>
       <div className="min-h-screen flex flex-col">
@@ -353,7 +384,7 @@ export default function Start() {
             <div className="max-w-md w-full mx-auto" data-aos="fade-up">
               <div className="text-center mb-8">
                 <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                  Get Started
+                  Set Up Your Portfolio
                 </h1>
                 <p className="text-gray-600">
                   Upload your portfolio statement and start receiving insights
@@ -366,22 +397,23 @@ export default function Start() {
                   handleFormSubmit(e);
                 }}
               >
-                <div>
-                  <label
-                    htmlFor="email"
-                    className="block text-sm font-medium text-gray-700 mb-1"
-                  >
-                    Email address
-                  </label>
-                  <input
-                    type="email"
-                    id="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent bg-white focus:bg-white"
-                    placeholder="you@example.com"
-                    required
-                  />
+                {/* Show logged-in user's email */}
+                <div className="bg-purple-50 border border-purple-100 rounded-lg p-4">
+                  <div className="flex items-center gap-3">
+                    {user?.imageUrl && (
+                      <Image
+                        src={user.imageUrl}
+                        alt="Profile"
+                        width={40}
+                        height={40}
+                        className="rounded-full"
+                      />
+                    )}
+                    <div>
+                      <p className="text-sm text-gray-500">Signed in as</p>
+                      <p className="font-medium text-gray-900">{email}</p>
+                    </div>
+                  </div>
                 </div>
 
                 <div>

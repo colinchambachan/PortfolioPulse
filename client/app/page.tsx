@@ -288,21 +288,21 @@ export default function Landing() {
                 alt="Wealthsimple"
                 width={180}
                 height={40}
-                className="h-8 sm:h-10 w-auto opacity-40 hover:opacity-100 transition-all duration-300 grayscale hover:grayscale-0"
+                className="h-8 sm:h-10 w-auto brand-rotate brand-rotate-1 hover:opacity-100 hover:grayscale-0 transition-all duration-300"
               />
               <Image
                 src="/rbc.png"
                 alt="RBC"
                 width={120}
                 height={80}
-                className="h-20 sm:h-24 w-auto opacity-40 hover:opacity-100 transition-all duration-300 grayscale hover:grayscale-0"
+                className="h-20 sm:h-24 w-auto brand-rotate brand-rotate-2 hover:opacity-100 hover:grayscale-0 transition-all duration-300"
               />
               <Image
                 src="/cibc.png"
                 alt="CIBC"
                 width={120}
                 height={40}
-                className="h-8 sm:h-10 w-auto opacity-40 hover:opacity-100 transition-all duration-300 grayscale hover:grayscale-0"
+                className="h-8 sm:h-10 w-auto brand-rotate brand-rotate-3 hover:opacity-100 hover:grayscale-0 transition-all duration-300"
               />
             </div>
           </div>
