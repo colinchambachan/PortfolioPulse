@@ -18,6 +18,11 @@ The product concept is clear and the frontend is in decent shape. The current pr
 
 - [Core Platform Stabilization Spec](docs/core-platform-stabilization-spec.md)
 - [Repo Maintenance Backlog](docs/repo-maintenance-backlog.md)
+- [Dev Environment](docs/DEV_ENVIRONMENT.md)
+
+## Deployment
+
+- Render backend blueprint: [render.yaml](render.yaml)
 
 These two docs are the working source of truth for the next phase of the project.
 
