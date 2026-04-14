@@ -7,7 +7,7 @@ import { BsQuestionCircle } from "react-icons/bs";
 import Image from "next/image";
 import { useMutation } from "@tanstack/react-query";
 import { useToast } from "@/components/ui/use-toast";
-import { useUser } from "@clerk/nextjs";
+import { useAuth, useUser } from "@clerk/nextjs";
 import {
   Dialog,
   DialogContent,
@@ -22,6 +22,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { apiFetch, ApiError, parseApiResponse } from "@/lib/api";
 
 interface PortfolioData {
   [key: string]: number;
@@ -36,12 +37,18 @@ interface UploadError {
   status?: number;
 }
 
-interface CreateUserResponse {
-  success: boolean;
-  message: string;
+interface PortfolioResponse {
+  email: string | null;
+  holdings: PortfolioData;
+  source: string | null;
+  schema_version: number;
+  created_at: string | null;
+  updated_at: string | null;
+  legacy_migrated: boolean;
 }
 
 export default function Start() {
+  const { getToken } = useAuth();
   const { user, isLoaded } = useUser();
   const [file, setFile] = useState<File | null>(null);
   const [editing, setEditing] = useState<string | null>(null);
@@ -107,42 +114,34 @@ export default function Start() {
     }
   };
 
-  const createUserMutation = useMutation<
-    CreateUserResponse,
+  const replacePortfolioMutation = useMutation<
+    PortfolioResponse,
     UploadError,
     {
       email: string;
-      portfolio: PortfolioData;
-      clerkId: string;
-      tier: "free" | "pro";
+      holdings: PortfolioData;
+      source: string;
     }
   >({
-    mutationFn: async ({ email, portfolio, clerkId, tier }) => {
+    mutationFn: async ({ email, holdings, source }) => {
       try {
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/user`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Accept: "application/json",
-            },
-            body: JSON.stringify({ email, portfolio, clerk_id: clerkId, tier }),
-            credentials: "include",
-          }
-        );
-
-        if (!response.ok) {
-          const errorData = await response.json().catch(() => ({}));
-          throw new Error(
-            errorData.message || `HTTP error! status: ${response.status}`
-          );
+        const token = await getToken();
+        if (!token) {
+          throw new ApiError("Please sign in to continue", 401);
         }
 
-        const responseData = await response.json();
-        return responseData;
+        const response = await apiFetch("/portfolio", {
+          method: "PUT",
+          body: JSON.stringify({ email, holdings, source }),
+          token,
+        });
+
+        return await parseApiResponse<PortfolioResponse>(response);
       } catch (error) {
-        console.error("Create user error:", error);
+        console.error("Replace portfolio error:", error);
+        if (error instanceof ApiError) {
+          throw { message: error.message, status: error.status };
+        }
         if (error instanceof Error) {
           throw { message: error.message };
         }
@@ -150,7 +149,7 @@ export default function Start() {
       }
     },
     onSuccess: (data) => {
-      console.log("User created successfully:", data);
+      console.log("Portfolio saved successfully:", data);
       setIsLoading(false);
       toast({
         title: "Success! 🎉",
@@ -161,7 +160,7 @@ export default function Start() {
       resetForm();
     },
     onError: (error) => {
-      console.error("Failed to create user:", error);
+      console.error("Failed to save portfolio:", error);
       setIsLoading(false);
       toast({
         variant: "destructive",
@@ -194,14 +193,13 @@ export default function Start() {
     }
     setIsLoading(true);
     try {
-      await createUserMutation.mutateAsync({
+      await replacePortfolioMutation.mutateAsync({
         email,
-        portfolio: data,
-        clerkId: user.id,
-        tier: "free", // Default to free tier for new signups
+        holdings: data,
+        source: file?.name === "sample_portfolio.pdf" ? "sample_portfolio" : "manual_upload",
       });
     } catch (error) {
-      console.error("Error during user creation:", error);
+      console.error("Error during portfolio save:", error);
     }
   };
 
@@ -217,32 +215,25 @@ export default function Start() {
       try {
         const formData = new FormData();
         formData.append("file", file);
-
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/extract-symbols`,
-          {
-            method: "POST",
-            body: formData,
-            headers: {
-              Accept: "application/json",
-            },
-            mode: "cors",
-            credentials: "include",
-          }
-        );
-
-        if (!response.ok) {
-          const errorData = await response.json().catch(() => ({}));
-          throw new Error(
-            errorData.message || `HTTP error! status: ${response.status}`
-          );
+        const token = await getToken();
+        if (!token) {
+          throw new ApiError("Please sign in to continue", 401);
         }
 
-        const data = await response.json();
+        const response = await apiFetch("/extract-symbols", {
+          method: "POST",
+          body: formData,
+          token,
+        });
+
+        const data = await parseApiResponse<APIResponse>(response);
         console.log("Response data:", data);
-        return data as APIResponse;
+        return data;
       } catch (error) {
         console.error("Detailed error:", error);
+        if (error instanceof ApiError) {
+          throw { message: error.message, status: error.status };
+        }
         if (error instanceof Error) {
           throw { message: error.message };
         }

@@ -8,3 +8,4 @@ slowapi
 python-dotenv
 opencv-python
 numpy
+PyJWT[crypto]

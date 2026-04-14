@@ -4,16 +4,17 @@ import AOS from "aos";
 import "aos/dist/aos.css";
 import { useMutation } from "@tanstack/react-query";
 import { useToast } from "@/components/ui/use-toast";
-import { useUser } from "@clerk/nextjs";
+import { useAuth, useUser } from "@clerk/nextjs";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { apiFetch, ApiError, parseApiResponse } from "@/lib/api";
 
-interface DeleteUserResponse {
-  success: boolean;
+interface DeletePortfolioResponse {
+  deleted: boolean;
   message: string;
 }
 
@@ -23,6 +24,7 @@ interface DeleteError {
 }
 
 export default function Configure() {
+  const { getToken } = useAuth();
   const { user, isLoaded } = useUser();
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
@@ -37,37 +39,29 @@ export default function Configure() {
   }, []);
 
   const deleteUserMutation = useMutation<
-    DeleteUserResponse,
+    DeletePortfolioResponse,
     DeleteError,
     string
   >({
     mutationFn: async (email: string) => {
       try {
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/user?email=${encodeURIComponent(
-            email
-          )}`,
-          {
-            method: "DELETE",
-            headers: {
-              "Content-Type": "application/json",
-              Accept: "application/json",
-            },
-            credentials: "include",
-          }
-        );
-
-        if (!response.ok) {
-          const errorData = await response.json().catch(() => ({}));
-          throw new Error(
-            errorData.message || `HTTP error! status: ${response.status}`
-          );
+        const token = await getToken();
+        if (!token) {
+          throw new ApiError("Please sign in to continue", 401);
         }
 
-        const responseData = await response.json();
-        return responseData;
+        const response = await apiFetch("/portfolio", {
+          method: "DELETE",
+          body: JSON.stringify({ email }),
+          token,
+        });
+
+        return await parseApiResponse<DeletePortfolioResponse>(response);
       } catch (error) {
         console.error("Delete user error:", error);
+        if (error instanceof ApiError) {
+          throw { message: error.message, status: error.status };
+        }
         if (error instanceof Error) {
           throw { message: error.message };
         }
@@ -178,7 +172,7 @@ export default function Configure() {
       <footer className="w-full text-center py-4 border-t border-gray-100 bg-white">
         <div className="text-center">
           <p className="text-sm">
-            &copy; 2025 Portfolio Pulse. All Rights Reserved.
+            &copy; {new Date().getFullYear()} Portfolio Pulse. All Rights Reserved.
           </p>
         </div>
       </footer>
