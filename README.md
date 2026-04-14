@@ -1,70 +1,73 @@
-# 📈 Portfolio Pulse
+# PortfolioPulse
 
-[https://www.portfoliopulse.xyz](https://www.portfoliopulse.xyz) <br>
-_Daily stock insights delivered to your inbox with just a scan of your portfolio_
+[https://www.portfoliopulse.xyz](https://www.portfoliopulse.xyz)
 
-[![Live Demo](https://img.shields.io/badge/Live-Demo-brightgreen)](https://www.portfoliopulse.xyz)
+Daily portfolio-aware market updates based on a user's holdings.
 
-<!-- [![Made with Python](https://img.shields.io/badge/Made%20with-Python-blue)](https://www.python.org/)
-[![AWS Services](https://img.shields.io/badge/Powered%20by-AWS-orange)](https://aws.amazon.com/) -->
+## Current Shape
 
-<img src="client\public\image.png" alt="Portfolio Pulse Demo" width="600"/>
+PortfolioPulse is split into three layers:
 
-## Overview
+- `client/`: Next.js 16 + React 19 frontend with Clerk auth and a marketing/onboarding flow.
+- `server/`: FastAPI service for OCR extraction and portfolio subscription management.
+- `aws/`: Lambda-based ingestion and email delivery experiments/prototypes.
 
-PortfolioPulse reshapes how you stay informed about your investments. Every morning at 6 AM, you receive curated news updates focused on your largest portfolio positions, helping you make informed decisions before the market opens.
+The product concept is clear and the frontend is in decent shape. The current priority is hardening the core platform so auth, persistence, ingestion, and delivery are reliable enough to build on.
 
-## Key Features
+## Core Docs
 
-- Automated portfolio analysis from PDF statements
-- Daily personalized news digests
-- Focus on your highest-value positions
-- Real-time processing with AWS
-- Modern, responsive web interface
+- [Core Platform Stabilization Spec](docs/core-platform-stabilization-spec.md)
+- [Repo Maintenance Backlog](docs/repo-maintenance-backlog.md)
+
+These two docs are the working source of truth for the next phase of the project.
+
+## Local Development
+
+### Client
+
+```bash
+cd client
+npm install
+npm run dev
+```
+
+Required env file:
+
+- `client/.env.local`
+- Example template: `client/.env.example`
+
+### Server
+
+```bash
+cd server
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+uvicorn main:app --reload
+```
+
+Required env file:
+
+- `server/.env`
+- Example template: `server/.env.example`
+- For authenticated API verification, configure either `CLERK_JWT_ISSUER` or `CLERK_JWKS_URL`
+
+### Verification
+
+```bash
+cd client && npm run lint && npm run build
+cd server && python3 -m py_compile main.py && . .venv/bin/activate && python -m unittest discover -s tests -p 'test_*.py'
+```
 
 ## Tech Stack
 
-### Frontend
+- Frontend: Next.js 16, React 19, TypeScript, Tailwind CSS, Clerk, TanStack Query
+- Backend: FastAPI, Tesseract, OpenCV, Pillow, pdf2image, DynamoDB via boto3
+- Cloud/prototypes: AWS Lambda, SES, SNS, S3, DynamoDB, Textract
 
-- Next.js 14
-- TypeScript
-- Tailwind CSS
-- Shadcn
+## Near-Term Direction
 
-### Backend
-
-- FastAPI (Python)
-- OpenCV
-- AWS Services:
-  - Lambda
-  - SES (Simple Email Service)
-  - SNS (Simple Notification Service)
-  - S3
-  - DynamoDB
-  - Textract
-- Docker
-
-## Workflow
-
-<img src="client\public\awsdiagram.png" alt="AWS Architecture Diagram" width="1200"/>
-
-1. User uploads portfolio statement (PDF)
-2. SymbolDetection Lambda analyzes document via Textract (Tesseract in user-facing version)
-3. Textract processes document and notifies SNS
-4. Extracted symbols are stored in DynamoDB
-5. Daily at 6 AM, EmailFunction Lambda:
-   - Retrieves stored symbols
-   - Fetches relevant news via News API
-   - Delivers personalized insights via SES (Gmail SMTP in user-facing version)
-
-## Roadmap
-
-- [x] ~~CLI Tool~~ (Replaced with web app)
-- [x] Email UI enhancements
-- [ ] Portfolio performance analytics
-- [ ] GenAI Recommendations, Summaries and insights
-- [ ] (Mar 2025 - Accepted to Microsoft for Startup Founders) Migrate to Azure Services
-
-## Contact
-
-Feel free to reach out with questions or feedback!
+- Lock down identity and API authorization
+- Clean up the DynamoDB data model and deletion path
+- Make ingestion and daily delivery user-aware rather than hard-coded
+- Add tests, docs, and observability before expanding the feature surface
