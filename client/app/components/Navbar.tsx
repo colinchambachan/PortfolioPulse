@@ -21,11 +21,6 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Close menu when route changes
-  useEffect(() => {
-    setIsOpen(false);
-  }, [pathname]);
-
   const isActive = (path: string) => pathname === path;
 
   return (
@@ -139,10 +134,18 @@ export default function Navbar() {
       >
         <div className="mx-4 mt-2 bg-white rounded-2xl overflow-hidden shadow-xl shadow-purple-500/10 border border-purple-100">
           <div className="p-2">
-            <MobileNavLink href="/contact" active={isActive("/contact")}>
+            <MobileNavLink
+              href="/contact"
+              active={isActive("/contact")}
+              onClick={() => setIsOpen(false)}
+            >
               Contact
             </MobileNavLink>
-            <MobileNavLink href="/pro" active={isActive("/pro")}>
+            <MobileNavLink
+              href="/pro"
+              active={isActive("/pro")}
+              onClick={() => setIsOpen(false)}
+            >
               <span className="font-bold">Pro</span>
             </MobileNavLink>
 
@@ -151,6 +154,7 @@ export default function Navbar() {
                 <MobileNavLink
                   href="/configure"
                   active={isActive("/configure")}
+                  onClick={() => setIsOpen(false)}
                 >
                   <span className="flex items-center gap-2">
                     <BsGear className="text-gray-400" />
@@ -159,7 +163,11 @@ export default function Navbar() {
                 </MobileNavLink>
 
                 <div className="px-2 pt-2 pb-2">
-                  <Link href="/start" className="block">
+                  <Link
+                    href="/start"
+                    className="block"
+                    onClick={() => setIsOpen(false)}
+                  >
                     <button className="w-full bg-purple-600 hover:bg-purple-500 text-white font-semibold py-3 px-4 rounded-xl transition-all duration-300">
                       Dashboard
                     </button>
@@ -228,14 +236,16 @@ function NavLink({
 function MobileNavLink({
   href,
   active,
+  onClick,
   children,
 }: {
   href: string;
   active: boolean;
+  onClick?: () => void;
   children: React.ReactNode;
 }) {
   return (
-    <Link href={href}>
+    <Link href={href} onClick={onClick}>
       <div
         className={`px-4 py-3 rounded-xl font-medium transition-all duration-300 ${
           active
