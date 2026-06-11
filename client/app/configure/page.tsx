@@ -4,15 +4,17 @@ import AOS from "aos";
 import "aos/dist/aos.css";
 import { useMutation } from "@tanstack/react-query";
 import { useToast } from "@/components/ui/use-toast";
+import { useAuth, useUser } from "@clerk/nextjs";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { apiFetch, ApiError, parseApiResponse } from "@/lib/api";
 
-interface DeleteUserResponse {
-  success: boolean;
+interface DeletePortfolioResponse {
+  deleted: boolean;
   message: string;
 }
 
@@ -22,9 +24,12 @@ interface DeleteError {
 }
 
 export default function Configure() {
-  const [email, setEmail] = useState("");
+  const { getToken } = useAuth();
+  const { user, isLoaded } = useUser();
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  
+  const email = user?.primaryEmailAddress?.emailAddress || "";
 
   useEffect(() => {
     AOS.init({
@@ -34,37 +39,29 @@ export default function Configure() {
   }, []);
 
   const deleteUserMutation = useMutation<
-    DeleteUserResponse,
+    DeletePortfolioResponse,
     DeleteError,
     string
   >({
     mutationFn: async (email: string) => {
       try {
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/user?email=${encodeURIComponent(
-            email
-          )}`,
-          {
-            method: "DELETE",
-            headers: {
-              "Content-Type": "application/json",
-              Accept: "application/json",
-            },
-            credentials: "include",
-          }
-        );
-
-        if (!response.ok) {
-          const errorData = await response.json().catch(() => ({}));
-          throw new Error(
-            errorData.message || `HTTP error! status: ${response.status}`
-          );
+        const token = await getToken();
+        if (!token) {
+          throw new ApiError("Please sign in to continue", 401);
         }
 
-        const responseData = await response.json();
-        return responseData;
+        const response = await apiFetch("/portfolio", {
+          method: "DELETE",
+          body: JSON.stringify({ email }),
+          token,
+        });
+
+        return await parseApiResponse<DeletePortfolioResponse>(response);
       } catch (error) {
         console.error("Delete user error:", error);
+        if (error instanceof ApiError) {
+          throw { message: error.message, status: error.status };
+        }
         if (error instanceof Error) {
           throw { message: error.message };
         }
@@ -80,7 +77,6 @@ export default function Configure() {
           "You have been unsubscribed from PortfolioPulse. We're sorry to see you go!",
         duration: 5000,
       });
-      setEmail("");
     },
     onError: (error) => {
       console.error("Failed to delete user:", error);
@@ -105,37 +101,39 @@ export default function Configure() {
     }
   };
 
+  if (!isLoaded) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="w-12 h-12 border-4 border-purple-200 rounded-full animate-spin border-t-purple-600"></div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex flex-col">
       <div className="flex-1 flex items-center justify-center px-8">
         <div className="max-w-md w-full" data-aos="fade-up">
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              Leave PortfolioPulse
+              Account Settings
             </h1>
             <p className="text-gray-600">
-              Sorry to see you go, please enter your subscribed email if you
-              wish to be removed from your automation
+              Manage your PortfolioPulse subscription
             </p>
           </div>
 
+          {/* Current account info */}
+          <div className="bg-purple-50 border border-purple-100 rounded-lg p-4 mb-6">
+            <p className="text-sm text-gray-500">Signed in as</p>
+            <p className="font-medium text-gray-900">{email}</p>
+          </div>
+
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                Email address
-              </label>
-              <input
-                type="email"
-                id="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent bg-white focus:bg-white"
-                placeholder="you@example.com"
-                required
-              />
+            <div className="bg-red-50 border border-red-100 rounded-lg p-4">
+              <h3 className="font-medium text-red-800 mb-2">Danger Zone</h3>
+              <p className="text-sm text-red-600 mb-4">
+                This will unsubscribe you from daily portfolio insights. Your account will remain but you won&apos;t receive any more emails.
+              </p>
             </div>
 
             <TooltipProvider>
@@ -174,7 +172,7 @@ export default function Configure() {
       <footer className="w-full text-center py-4 border-t border-gray-100 bg-white">
         <div className="text-center">
           <p className="text-sm">
-            &copy; 2025 Portfolio Pulse. All Rights Reserved.
+            &copy; {new Date().getFullYear()} Portfolio Pulse. All Rights Reserved.
           </p>
         </div>
       </footer>

@@ -4,11 +4,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
+import { SignInButton, SignUpButton, UserButton, useUser } from "@clerk/nextjs";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const pathname = usePathname();
+  const { isSignedIn, isLoaded } = useUser();
 
   // Handle scroll effect
   useEffect(() => {
@@ -18,11 +20,6 @@ export default function Navbar() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-
-  // Close menu when route changes
-  useEffect(() => {
-    setIsOpen(false);
-  }, [pathname]);
 
   const isActive = (path: string) => pathname === path;
 
@@ -60,20 +57,44 @@ export default function Navbar() {
           <NavLink href="/pro" active={isActive("/pro")}>
             <span className="font-bold">Pro</span>
           </NavLink>
-          
+
           <div className="w-px h-6 bg-purple-200 mx-3" />
-          
-          <Link href="/configure">
-            <button className="p-2.5 rounded-lg text-gray-500 hover:text-purple-600 hover:bg-purple-50 transition-all duration-300">
-              <BsGear className="text-xl" />
-            </button>
-          </Link>
-          
-          <Link href="/start" className="ml-2">
-            <button className="relative overflow-hidden bg-purple-600 hover:bg-purple-500 text-white font-semibold px-5 py-2.5 rounded-xl transition-all duration-300 hover:shadow-[0_4px_20px_rgba(147,51,234,0.35)] active:scale-[0.98]">
-              Get Started
-            </button>
-          </Link>
+
+          {isLoaded && isSignedIn ? (
+            <>
+              <Link href="/configure">
+                <button className="p-2.5 rounded-lg text-gray-500 hover:text-purple-600 hover:bg-purple-50 transition-all duration-300">
+                  <BsGear className="text-xl" />
+                </button>
+              </Link>
+              <Link href="/start" className="ml-2 mr-3">
+                <button className="relative overflow-hidden bg-purple-600 hover:bg-purple-500 text-white font-semibold px-5 py-2.5 rounded-xl transition-all duration-300 hover:shadow-[0_4px_20px_rgba(147,51,234,0.35)] active:scale-[0.98]">
+                  Dashboard
+                </button>
+              </Link>
+              <UserButton
+                afterSignOutUrl="/"
+                appearance={{
+                  elements: {
+                    avatarBox: "w-9 h-9",
+                  },
+                }}
+              />
+            </>
+          ) : (
+            <>
+              <SignInButton mode="modal">
+                <button className="px-4 py-2 rounded-lg font-medium text-gray-600 hover:text-purple-600 hover:bg-purple-50 transition-all duration-300">
+                  Sign In
+                </button>
+              </SignInButton>
+              <SignUpButton mode="modal">
+                <button className="relative overflow-hidden bg-purple-600 hover:bg-purple-500 text-white font-semibold px-5 py-2.5 rounded-xl transition-all duration-300 hover:shadow-[0_4px_20px_rgba(147,51,234,0.35)] active:scale-[0.98]">
+                  Get Started
+                </button>
+              </SignUpButton>
+            </>
+          )}
         </div>
 
         {/* Mobile Menu Button */}
@@ -113,26 +134,74 @@ export default function Navbar() {
       >
         <div className="mx-4 mt-2 bg-white rounded-2xl overflow-hidden shadow-xl shadow-purple-500/10 border border-purple-100">
           <div className="p-2">
-            <MobileNavLink href="/contact" active={isActive("/contact")}>
+            <MobileNavLink
+              href="/contact"
+              active={isActive("/contact")}
+              onClick={() => setIsOpen(false)}
+            >
               Contact
             </MobileNavLink>
-            <MobileNavLink href="/pro" active={isActive("/pro")}>
+            <MobileNavLink
+              href="/pro"
+              active={isActive("/pro")}
+              onClick={() => setIsOpen(false)}
+            >
               <span className="font-bold">Pro</span>
             </MobileNavLink>
-            <MobileNavLink href="/configure" active={isActive("/configure")}>
-              <span className="flex items-center gap-2">
-                <BsGear className="text-gray-400" />
-                Configure
-              </span>
-            </MobileNavLink>
-            
-            <div className="px-2 pt-2 pb-2">
-              <Link href="/start" className="block">
-                <button className="w-full bg-purple-600 hover:bg-purple-500 text-white font-semibold py-3 px-4 rounded-xl transition-all duration-300">
-                  Get Started
-                </button>
-              </Link>
-            </div>
+
+            {isLoaded && isSignedIn ? (
+              <>
+                <MobileNavLink
+                  href="/configure"
+                  active={isActive("/configure")}
+                  onClick={() => setIsOpen(false)}
+                >
+                  <span className="flex items-center gap-2">
+                    <BsGear className="text-gray-400" />
+                    Settings
+                  </span>
+                </MobileNavLink>
+
+                <div className="px-2 pt-2 pb-2">
+                  <Link
+                    href="/start"
+                    className="block"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    <button className="w-full bg-purple-600 hover:bg-purple-500 text-white font-semibold py-3 px-4 rounded-xl transition-all duration-300">
+                      Dashboard
+                    </button>
+                  </Link>
+                </div>
+
+                <div className="px-4 py-3 border-t border-gray-100 flex items-center gap-3">
+                  <UserButton
+                    afterSignOutUrl="/"
+                    appearance={{
+                      elements: {
+                        avatarBox: "w-8 h-8",
+                      },
+                    }}
+                  />
+                  <span className="text-sm text-gray-600">Account</span>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="px-2 pt-2 pb-2 space-y-2">
+                  <SignInButton mode="modal">
+                    <button className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-3 px-4 rounded-xl transition-all duration-300">
+                      Sign In
+                    </button>
+                  </SignInButton>
+                  <SignUpButton mode="modal">
+                    <button className="w-full bg-purple-600 hover:bg-purple-500 text-white font-semibold py-3 px-4 rounded-xl transition-all duration-300">
+                      Get Started
+                    </button>
+                  </SignUpButton>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -167,14 +236,16 @@ function NavLink({
 function MobileNavLink({
   href,
   active,
+  onClick,
   children,
 }: {
   href: string;
   active: boolean;
+  onClick?: () => void;
   children: React.ReactNode;
 }) {
   return (
-    <Link href={href}>
+    <Link href={href} onClick={onClick}>
       <div
         className={`px-4 py-3 rounded-xl font-medium transition-all duration-300 ${
           active

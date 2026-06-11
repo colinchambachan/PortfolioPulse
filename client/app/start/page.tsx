@@ -7,6 +7,7 @@ import { BsQuestionCircle } from "react-icons/bs";
 import Image from "next/image";
 import { useMutation } from "@tanstack/react-query";
 import { useToast } from "@/components/ui/use-toast";
+import { useAuth, useUser } from "@clerk/nextjs";
 import {
   Dialog,
   DialogContent,
@@ -21,6 +22,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { apiFetch, ApiError, parseApiResponse } from "@/lib/api";
 
 interface PortfolioData {
   [key: string]: number;
@@ -35,13 +37,19 @@ interface UploadError {
   status?: number;
 }
 
-interface CreateUserResponse {
-  success: boolean;
-  message: string;
+interface PortfolioResponse {
+  email: string | null;
+  holdings: PortfolioData;
+  source: string | null;
+  schema_version: number;
+  created_at: string | null;
+  updated_at: string | null;
+  legacy_migrated: boolean;
 }
 
 export default function Start() {
-  const [email, setEmail] = useState("");
+  const { getToken } = useAuth();
+  const { user, isLoaded } = useUser();
   const [file, setFile] = useState<File | null>(null);
   const [editing, setEditing] = useState<string | null>(null);
   const [newValue, setNewValue] = useState<number | string>("");
@@ -51,6 +59,9 @@ export default function Start() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { toast } = useToast();
+
+  // Get email from Clerk user
+  const email = user?.primaryEmailAddress?.emailAddress || "";
 
   // Function to trigger editing mode for a specific symbol
   const handleEdit = (symbol: string): void => {
@@ -91,7 +102,6 @@ export default function Start() {
   };
 
   const resetForm = () => {
-    setEmail("");
     setFile(null);
     setEditing(null);
     setNewValue("");
@@ -104,37 +114,34 @@ export default function Start() {
     }
   };
 
-  const createUserMutation = useMutation<
-    CreateUserResponse,
+  const replacePortfolioMutation = useMutation<
+    PortfolioResponse,
     UploadError,
-    { email: string; portfolio: PortfolioData }
+    {
+      email: string;
+      holdings: PortfolioData;
+      source: string;
+    }
   >({
-    mutationFn: async ({ email, portfolio }) => {
+    mutationFn: async ({ email, holdings, source }) => {
       try {
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/user`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Accept: "application/json",
-            },
-            body: JSON.stringify({ email, portfolio }),
-            credentials: "include",
-          }
-        );
-
-        if (!response.ok) {
-          const errorData = await response.json().catch(() => ({}));
-          throw new Error(
-            errorData.message || `HTTP error! status: ${response.status}`
-          );
+        const token = await getToken();
+        if (!token) {
+          throw new ApiError("Please sign in to continue", 401);
         }
 
-        const responseData = await response.json();
-        return responseData;
+        const response = await apiFetch("/portfolio", {
+          method: "PUT",
+          body: JSON.stringify({ email, holdings, source }),
+          token,
+        });
+
+        return await parseApiResponse<PortfolioResponse>(response);
       } catch (error) {
-        console.error("Create user error:", error);
+        console.error("Replace portfolio error:", error);
+        if (error instanceof ApiError) {
+          throw { message: error.message, status: error.status };
+        }
         if (error instanceof Error) {
           throw { message: error.message };
         }
@@ -142,7 +149,7 @@ export default function Start() {
       }
     },
     onSuccess: (data) => {
-      console.log("User created successfully:", data);
+      console.log("Portfolio saved successfully:", data);
       setIsLoading(false);
       toast({
         title: "Success! 🎉",
@@ -153,7 +160,7 @@ export default function Start() {
       resetForm();
     },
     onError: (error) => {
-      console.error("Failed to create user:", error);
+      console.error("Failed to save portfolio:", error);
       setIsLoading(false);
       toast({
         variant: "destructive",
@@ -175,11 +182,24 @@ export default function Start() {
       });
       return;
     }
+    if (!user?.id) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Please sign in to continue",
+        duration: 5000,
+      });
+      return;
+    }
     setIsLoading(true);
     try {
-      await createUserMutation.mutateAsync({ email, portfolio: data });
+      await replacePortfolioMutation.mutateAsync({
+        email,
+        holdings: data,
+        source: file?.name === "sample_portfolio.pdf" ? "sample_portfolio" : "manual_upload",
+      });
     } catch (error) {
-      console.error("Error during user creation:", error);
+      console.error("Error during portfolio save:", error);
     }
   };
 
@@ -195,32 +215,25 @@ export default function Start() {
       try {
         const formData = new FormData();
         formData.append("file", file);
-
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/extract-symbols`,
-          {
-            method: "POST",
-            body: formData,
-            headers: {
-              Accept: "application/json",
-            },
-            mode: "cors",
-            credentials: "include",
-          }
-        );
-
-        if (!response.ok) {
-          const errorData = await response.json().catch(() => ({}));
-          throw new Error(
-            errorData.message || `HTTP error! status: ${response.status}`
-          );
+        const token = await getToken();
+        if (!token) {
+          throw new ApiError("Please sign in to continue", 401);
         }
 
-        const data = await response.json();
+        const response = await apiFetch("/extract-symbols", {
+          method: "POST",
+          body: formData,
+          token,
+        });
+
+        const data = await parseApiResponse<APIResponse>(response);
         console.log("Response data:", data);
-        return data as APIResponse;
+        return data;
       } catch (error) {
         console.error("Detailed error:", error);
+        if (error instanceof ApiError) {
+          throw { message: error.message, status: error.status };
+        }
         if (error instanceof Error) {
           throw { message: error.message };
         }
@@ -344,6 +357,15 @@ export default function Start() {
     }
   };
 
+  // Show loading while Clerk loads
+  if (!isLoaded) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="w-12 h-12 border-4 border-purple-200 rounded-full animate-spin border-t-purple-600"></div>
+      </div>
+    );
+  }
+
   return (
     <>
       <div className="min-h-screen flex flex-col">
@@ -353,7 +375,7 @@ export default function Start() {
             <div className="max-w-md w-full mx-auto" data-aos="fade-up">
               <div className="text-center mb-8">
                 <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                  Get Started
+                  Set Up Your Portfolio
                 </h1>
                 <p className="text-gray-600">
                   Upload your portfolio statement and start receiving insights
@@ -366,22 +388,23 @@ export default function Start() {
                   handleFormSubmit(e);
                 }}
               >
-                <div>
-                  <label
-                    htmlFor="email"
-                    className="block text-sm font-medium text-gray-700 mb-1"
-                  >
-                    Email address
-                  </label>
-                  <input
-                    type="email"
-                    id="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent bg-white focus:bg-white"
-                    placeholder="you@example.com"
-                    required
-                  />
+                {/* Show logged-in user's email */}
+                <div className="bg-purple-50 border border-purple-100 rounded-lg p-4">
+                  <div className="flex items-center gap-3">
+                    {user?.imageUrl && (
+                      <Image
+                        src={user.imageUrl}
+                        alt="Profile"
+                        width={40}
+                        height={40}
+                        className="rounded-full"
+                      />
+                    )}
+                    <div>
+                      <p className="text-sm text-gray-500">Signed in as</p>
+                      <p className="font-medium text-gray-900">{email}</p>
+                    </div>
+                  </div>
                 </div>
 
                 <div>

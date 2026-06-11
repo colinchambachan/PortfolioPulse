@@ -3,14 +3,21 @@
 **/libraries/*
 */.aws-sam
 **/__pycache__/*
+**/.pytest_cache/*
+**/.mypy_cache/*
 
 *.jpg
 **DS_Store
+.vscode/
 
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
-**.env
-/PortfolioPulseDocs/*
+**/.env
+**/.env.*
+!**/.env.example
+
+# Never commit working docs, exports, screenshots, or secrets from this folder.
+/PortfolioPulseDocs/
 # dependencies
 /client/node_modules
 /client/.pnp
@@ -40,9 +47,12 @@
 /client/yarn-debug.log*
 /client/yarn-error.log*
 /client/.pnpm-debug.log*
+/server/.venv/
+/server/.ruff_cache/
 
 # env files (can opt-in for committing if needed)
 /client/.env*
+!/client/.env.example
 
 # vercel
 /client/.vercel
